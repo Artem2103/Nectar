@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../features/groups/presentation/groups_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/meals/presentation/add_meal_screen.dart';
 import '../../features/navigation/home_shell.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
@@ -33,6 +34,13 @@ abstract final class AppRouter {
             _branch(AppRoutes.profile, AppRoutes.profileName,
                 const ProfileScreen()),
           ],
+        ),
+        // Pushed above the shell so it covers the bottom bar — the central
+        // "add meal" action.
+        GoRoute(
+          path: AppRoutes.addMeal,
+          name: AppRoutes.addMealName,
+          builder: (context, state) => const AddMealScreen(),
         ),
       ],
     );

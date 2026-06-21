@@ -1,0 +1,255 @@
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
+
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_radii.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_background.dart';
+import '../../../core/widgets/pill_button.dart';
+import '../../../core/widgets/screen_title.dart';
+import '../application/meal_analyser.dart';
+import '../application/meal_provider.dart';
+import '../domain/meal_entry.dart';
+import 'widgets/meal_image_picker.dart';
+
+/// Full-screen flow for logging a meal: pick a photo, optionally let the vision
+/// model estimate its macros, edit the figures, then save.
+class AddMealScreen extends ConsumerStatefulWidget {
+  const AddMealScreen({super.key});
+
+  @override
+  ConsumerState<AddMealScreen> createState() => _AddMealScreenState();
+}
+
+class _AddMealScreenState extends ConsumerState<AddMealScreen> {
+  final _formKey = GlobalKey<FormState>();
+  final _name = TextEditingController();
+  final _kcal = TextEditingController();
+  final _protein = TextEditingController();
+  final _carbs = TextEditingController();
+  final _fat = TextEditingController();
+
+  File? _image;
+  bool _analysing = false;
+
+  @override
+  void dispose() {
+    for (final c in [_name, _kcal, _protein, _carbs, _fat]) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (picked == null) return;
+    setState(() => _image = File(picked.path));
+  }
+
+  Future<void> _analyse() async {
+    final image = _image;
+    if (image == null) return;
+    setState(() => _analysing = true);
+    try {
+      final result = await analyseImage(image);
+      _name.text = result.name;
+      _kcal.text = result.kcal.toString();
+      _protein.text = result.proteinG.toStringAsFixed(0);
+      _carbs.text = result.carbsG.toStringAsFixed(0);
+      _fat.text = result.fatG.toStringAsFixed(0);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("Couldn't analyse photo: $e")));
+      }
+    } finally {
+      if (mounted) setState(() => _analysing = false);
+    }
+  }
+
+  void _save() {
+    if (!_formKey.currentState!.validate()) return;
+    final entry = MealEntry(
+      id: const Uuid().v4(),
+      timestamp: DateTime.now(),
+      name: _name.text.trim(),
+      imagePath: _image?.path,
+      kcal: int.parse(_kcal.text),
+      proteinG: double.parse(_protein.text),
+      carbsG: double.parse(_carbs.text),
+      fatG: double.parse(_fat.text),
+    );
+    ref.read(mealRepositoryProvider.notifier).addMeal(entry);
+    context.pop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: AppBackground(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.screenHPadding,
+              AppSpacing.md,
+              AppSpacing.screenHPadding,
+              AppSpacing.xxl,
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      IconButton(
+                        onPressed: () => context.pop(),
+                        icon: const Icon(Icons.arrow_back_rounded),
+                        color: AppColors.textPrimary,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      const ScreenTitle('Add Meal'),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  MealImagePicker(image: _image, onTap: _pickImage),
+                  const SizedBox(height: AppSpacing.xl),
+                  _Field(
+                    controller: _name,
+                    label: 'Meal name',
+                    validator: (v) =>
+                        (v == null || v.trim().isEmpty) ? 'Required' : null,
+                  ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _Field(
+                          controller: _kcal,
+                          label: 'Calories',
+                          number: true,
+                          integer: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _Field(
+                          controller: _protein,
+                          label: 'Protein g',
+                          number: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _Field(
+                          controller: _carbs,
+                          label: 'Carbs g',
+                          number: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _Field(
+                          controller: _fat,
+                          label: 'Fat g',
+                          number: true,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  Row(
+                    children: [
+                      PillButton(
+                        label: _analysing ? 'Analysing…' : 'Analyse photo',
+                        icon: Icons.auto_awesome_rounded,
+                        onPressed:
+                            (_image == null || _analysing) ? null : _analyse,
+                      ),
+                      const Spacer(),
+                      PillButton(
+                        label: 'Save meal',
+                        icon: Icons.check_rounded,
+                        onPressed: _analysing ? null : _save,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A labelled [TextFormField] matching the app's typography, with optional
+/// numeric-only input and validation.
+class _Field extends StatelessWidget {
+  const _Field({
+    required this.controller,
+    required this.label,
+    this.number = false,
+    this.integer = false,
+    this.validator,
+  });
+
+  final TextEditingController controller;
+  final String label;
+  final bool number;
+  final bool integer;
+  final String? Function(String?)? validator;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      keyboardType: number
+          ? TextInputType.numberWithOptions(decimal: !integer)
+          : TextInputType.text,
+      inputFormatters: number
+          ? [
+              FilteringTextInputFormatter.allow(
+                integer ? RegExp(r'[0-9]') : RegExp(r'[0-9.]'),
+              ),
+            ]
+          : null,
+      style: AppTypography.body,
+      decoration: InputDecoration(
+        labelText: label,
+        labelStyle: AppTypography.label,
+        filled: true,
+        fillColor: AppColors.surface,
+        border: const OutlineInputBorder(
+          borderRadius: AppRadii.lgAll,
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+        enabledBorder: const OutlineInputBorder(
+          borderRadius: AppRadii.lgAll,
+          borderSide: BorderSide(color: AppColors.border),
+        ),
+      ),
+      validator: validator ??
+          (number
+              ? (v) {
+                  if (v == null || v.isEmpty) return 'Required';
+                  final parsed =
+                      integer ? int.tryParse(v) : double.tryParse(v);
+                  return parsed == null ? 'Invalid' : null;
+                }
+              : null),
+    );
+  }
+}

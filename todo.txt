@@ -15,7 +15,7 @@
 ## Screens
 
 - [x] Home (header, weekly calendar, nutrition/activity stat carousel, recently-uploaded empty state)
-- [~] Progress (title/scaffold done; streak/weight/chart cards pending)
+- [x] Progress (streak + badges, current-weight journey, weight-trend chart)
 - [x] Groups (maintenance placeholder)
 - [x] Profile (maintenance placeholder)
 
@@ -28,20 +28,63 @@
 - [x] Nutrition card (macro stat card + calories card)
 - [x] Calendar strip
 - [x] Health score card
-- [ ] Meal card
+- [x] Progress bar (reusable linear fill)
+- [x] Streak card / Badges card
+- [x] Current weight card
+- [x] Weight chart card (line chart + range selector)
+- [ ] Meal card (name, image thumbnail, macros, time)
+
+---
+
+## Phase 1 — Data Layer  (foundation; everything else depends on this)
+
+- [ ] Add packages: shared_preferences, image_picker, http, uuid
+- [ ] MealEntry model  (id, timestamp, name, imagePath, kcal, protein, carbs, fat, fiber, sugar, sodium)
+- [ ] WeightEntry model  (id, timestamp, valueKg)
+- [ ] UserGoals model  (dailyKcal, proteinG, carbsG, fatG, startWeightKg, goalWeightKg)
+- [ ] MealRepository  — CRUD + persist list as JSON in SharedPreferences
+- [ ] WeightRepository — CRUD + persist list as JSON in SharedPreferences
+- [ ] GoalsRepository  — read/write UserGoals as JSON in SharedPreferences
+- [ ] Riverpod providers for each repository (AsyncNotifierProvider)
+- [ ] Replace dailySummaryProvider: read today's meals from MealRepository, compute remaining macros vs UserGoals
+- [ ] Replace progressSummaryProvider: read WeightRepository + MealRepository (streak logic)
+
+## Phase 2 — Add Meal Flow
+
+- [ ] Wire FAB → /add-meal route (GoRouter push, not shell branch)
+- [ ] AddMealScreen: manual form (meal name, kcal, protein, carbs, fat)
+- [ ] "Analyse photo" button: image_picker → send image to Claude API → auto-fill form fields
+- [ ] ConfirmMealScreen: show AI-parsed result, allow edits, confirm button saves to MealRepository
+- [ ] On save: pop back to Home; provider invalidation triggers reactive rebuild
+- [ ] Meal card widget: show in "Recently uploaded" list on Home
+
+## Phase 3 — Progress & Weight Logging
+
+- [ ] "Log weight" dialog on Progress screen (tap button → bottom sheet with number input)
+- [ ] Save WeightEntry to WeightRepository
+- [ ] Streak computed from MealRepository (days with ≥ 1 meal logged, consecutive from today)
+- [ ] WeightChartCard uses real WeightRepository data
+- [ ] Badge awards: 1-day streak, 7-day streak, first meal logged
+
+## Phase 4 — User Goals / Profile
+
+- [ ] Profile screen: form to set daily kcal goal + macro targets
+- [ ] Start weight + goal weight entry (feeds Progress screen journey bar)
+- [ ] Persist via GoalsRepository; providers invalidate on change
+
+---
 
 ## AI
 
-- [ ] Camera
-- [ ] Image picker
-- [ ] AI analysis
-- [ ] Result screen
+- [x] Planned: image_picker + Claude API vision call in Add Meal flow (Phase 2)
+- [ ] Camera capture (alternative to gallery pick)
+- [ ] Result / confirmation screen with editable fields
 
-## Backend
+## Backend (post-MVP)
 
 - [ ] Authentication
-- [ ] Database
-- [ ] Storage
+- [ ] Cloud database (replace SharedPreferences repositories)
+- [ ] Image storage
 
 ## Polish
 

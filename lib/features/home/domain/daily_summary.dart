@@ -85,7 +85,7 @@ class DailySummary {
   /// static MVP values shown in `Nectar.pdf` until real tracking is wired in.
   factory DailySummary.placeholder({DateTime? today}) {
     return DailySummary(
-      week: _currentWeek(today ?? DateTime.now()),
+      week: buildWeek(today ?? DateTime.now()),
       caloriesLeft: 2000,
       primaryMacros: const [
         MacroStat(label: 'Proteins left', grams: 60, asset: AppAssets.protein),
@@ -120,7 +120,9 @@ class DailySummary {
     'Sun',
   ];
 
-  static List<CalendarDay> _currentWeek(DateTime today) {
+  /// Builds the Monday–Sunday calendar strip for the week containing [today],
+  /// with the matching day flagged as selected.
+  static List<CalendarDay> buildWeek(DateTime today) {
     // DateTime.weekday is Mon=1..Sun=7; rewind to this week's Monday.
     final monday = DateTime(today.year, today.month, today.day)
         .subtract(Duration(days: today.weekday - 1));

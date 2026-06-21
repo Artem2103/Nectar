@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../app/router/app_routes.dart';
 import '../../core/theme/app_spacing.dart';
 import '../../core/widgets/app_background.dart';
 import 'widgets/app_bottom_nav_bar.dart';
@@ -49,12 +50,8 @@ class HomeShell extends StatelessWidget {
   }
 
   void _onAddMeal(BuildContext context) {
-    // Meal capture flow is a future feature; surfaced here as the entry point.
-    ScaffoldMessenger.of(context)
-      ..hideCurrentSnackBar()
-      ..showSnackBar(
-        const SnackBar(content: Text('Meal capture is coming soon')),
-      );
+    // The central action: open the full-screen meal-capture flow.
+    context.push(AppRoutes.addMeal);
   }
 
   @override
