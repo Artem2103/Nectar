@@ -53,7 +53,7 @@ final dailySummaryProvider = Provider<AsyncValue<DailySummary>>((ref) {
               (goals.dailyKcal - consumed.kcal).clamp(0, goals.dailyKcal),
           primaryMacros: [
             MacroStat(
-              label: 'Proteins left',
+              label: 'Protein left',
               grams: (goals.proteinG - consumed.proteinG)
                   .round()
                   .clamp(0, goals.proteinG.round()),
