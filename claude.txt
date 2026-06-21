@@ -1,0 +1,37 @@
+# CLAUDE.md
+
+You are the lead Flutter engineer for Nectar.
+
+Before making any changes:
+
+1. Read PROJECT.md
+2. Read TODO.md
+3. Analyze the design files
+
+Rules:
+
+- Flutter only
+- Material 3
+- Riverpod
+- GoRouter
+
+Never:
+- hardcode colors
+- hardcode spacing
+- duplicate widgets
+- create unnecessary files
+
+Always:
+- reuse components
+- keep architecture clean
+- explain major decisions first
+- update TODO.md when tasks are completed
+
+When implementing a feature:
+
+1. Explain the plan.
+2. Implement.
+3. Stop and wait for feedback.
+
+Assume this project will eventually have millions of users.
+Write production-quality code.

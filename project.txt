@@ -1,0 +1,275 @@
+# Nectar
+
+Version: MVP v1
+
+---
+
+# Vision
+
+Nectar is an AI-powered nutrition and health tracking application that makes calorie and macro tracking effortless.
+
+Instead of manually entering meals, users take a photo of their food and receive an AI analysis including calories, protein, carbohydrates, fat, fiber, sugar, sodium, and a health score.
+
+The experience should feel modern, minimal, fast, and premium.
+
+Primary inspiration:
+- Cal AI
+- Apple Health
+- MyFitnessPal (simplicity only)
+
+---
+
+# MVP Goal
+
+Build an Android application using Flutter.
+
+The first version focuses on:
+
+- Beautiful UI
+- Excellent UX
+- AI meal logging
+- Daily nutrition tracking
+
+Backend, authentication, subscriptions and advanced social features can be implemented later.
+
+---
+
+# Technology Stack
+
+Framework:
+Flutter
+
+Language:
+Dart
+
+State Management:
+Riverpod
+
+Navigation:
+GoRouter
+
+Design:
+Material 3
+
+Architecture:
+Feature-first architecture
+
+The project should be scalable and production-ready.
+
+---
+
+# Design Philosophy
+
+The application should feel:
+
+- Minimal
+- Premium
+- Modern
+- Clean
+- Fast
+
+Avoid clutter.
+
+Lots of whitespace.
+
+Large rounded cards.
+
+Smooth animations.
+
+Apple-quality polish.
+
+---
+
+# Design Rules
+
+Never hardcode:
+
+- colors
+- spacing
+- font sizes
+- border radius
+- shadows
+
+Always use theme constants.
+
+Create reusable widgets.
+
+If something appears twice, create a reusable component.
+
+---
+
+# Theme
+
+Primary background:
+White
+
+Accent:
+Green
+
+Cards:
+Rounded with soft shadows
+
+Typography:
+Inter (or SF Pro equivalent)
+
+Spacing:
+Consistent 8pt grid
+
+---
+
+# Navigation
+
+Bottom Navigation:
+
+Home
+Progress
+Groups
+Profile
+
+Floating Action Button:
+
++
+
+Used for adding meals.
+
+---
+
+# Home Screen
+
+Contains:
+
+Weekly calendar
+
+Nutrition cards
+
+Recently uploaded meals
+
+Floating action button
+
+The home screen should immediately communicate daily nutrition status.
+
+---
+
+# Progress Screen
+
+Contains:
+
+Current weight
+
+Weight goal
+
+Weight graph
+
+Day streak
+
+Badges
+
+Progress statistics
+
+---
+
+# Groups
+
+Currently under maintenance.
+
+Display placeholder screen.
+
+---
+
+# Profile
+
+Currently under maintenance.
+
+Display placeholder screen.
+
+---
+
+# Future Features
+
+Camera
+
+Gallery upload
+
+AI meal recognition
+
+Meal history
+
+Macro analysis
+
+Micronutrients
+
+Water tracking
+
+Step tracking
+
+Health score
+
+Barcode scanner
+
+AI recommendations
+
+Notifications
+
+Premium subscription
+
+Friends
+
+Challenges
+
+---
+
+# Coding Rules
+
+Prefer readability over cleverness.
+
+Prefer reusable widgets over duplicated code.
+
+Keep widgets small.
+
+Keep business logic separate from UI.
+
+Follow Flutter best practices.
+
+---
+
+# Workflow
+
+Never implement multiple major features at once.
+
+Always:
+
+1. Explain the plan.
+2. Implement.
+3. Wait for confirmation.
+
+Do not refactor unrelated code.
+
+Do not change existing UI unless requested.
+
+---
+
+# Assets
+
+All assets are located inside:
+
+assets/
+
+Use existing assets whenever possible.
+
+Do not replace icons or illustrations unless instructed.
+
+---
+
+# AI Instructions
+
+Behave like a senior Flutter engineer.
+
+If uncertain, ask instead of guessing.
+
+Optimize for maintainability.
+
+Generate production-quality code.
+
+Never sacrifice architecture for speed.
+
+Always preserve existing functionality.

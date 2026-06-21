@@ -1,0 +1,51 @@
+# Nectar MVP
+
+## Foundation
+
+- [x] Create Flutter project
+- [x] Create folder structure (feature-first: app/, core/, features/)
+- [x] Create theme (Material 3 customised, Inter bundled)
+- [x] Create design system (colors, spacing, radii, shadows, typography tokens)
+
+## Navigation
+
+- [x] Bottom navigation (custom floating bar, GoRouter StatefulShellRoute)
+- [x] Floating action button (add-meal entry point)
+
+## Screens
+
+- [~] Home (header + recently-uploaded empty state done; calendar + stat carousel pending)
+- [~] Progress (title/scaffold done; streak/weight/chart cards pending)
+- [x] Groups (maintenance placeholder)
+- [x] Profile (maintenance placeholder)
+
+## Components
+
+- [x] App card (reusable rounded surface + muted variant)
+- [x] Section / screen titles
+- [x] Pill button
+- [x] Maintenance view
+- [ ] Nutrition card
+- [ ] Calendar strip
+- [ ] Health score card
+- [ ] Meal card
+
+## AI
+
+- [ ] Camera
+- [ ] Image picker
+- [ ] AI analysis
+- [ ] Result screen
+
+## Backend
+
+- [ ] Authentication
+- [ ] Database
+- [ ] Storage
+
+## Polish
+
+- [ ] Animations
+- [ ] Dark mode
+- [ ] Different Languages
+- [ ] Accessibility
