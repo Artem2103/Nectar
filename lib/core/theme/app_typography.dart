@@ -30,7 +30,7 @@ abstract final class AppTypography {
 
   /// Oversized hero numeral — the "2000" calories figure.
   static TextStyle get hero => _base.copyWith(
-        fontSize: 64,
+        fontSize: 52,
         fontWeight: extraBold,
         letterSpacing: -1.5,
         height: 1.0,
@@ -45,7 +45,7 @@ abstract final class AppTypography {
 
   /// Prominent numeral inside a card — "74 kg", "60g".
   static TextStyle get statNumber => _base.copyWith(
-        fontSize: 30,
+        fontSize: 24,
         fontWeight: bold,
         letterSpacing: -0.6,
       );

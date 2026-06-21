@@ -14,7 +14,7 @@
 
 ## Screens
 
-- [~] Home (header + recently-uploaded empty state done; calendar + stat carousel pending)
+- [x] Home (header, weekly calendar, nutrition/activity stat carousel, recently-uploaded empty state)
 - [~] Progress (title/scaffold done; streak/weight/chart cards pending)
 - [x] Groups (maintenance placeholder)
 - [x] Profile (maintenance placeholder)
@@ -25,9 +25,9 @@
 - [x] Section / screen titles
 - [x] Pill button
 - [x] Maintenance view
-- [ ] Nutrition card
-- [ ] Calendar strip
-- [ ] Health score card
+- [x] Nutrition card (macro stat card + calories card)
+- [x] Calendar strip
+- [x] Health score card
 - [ ] Meal card
 
 ## AI

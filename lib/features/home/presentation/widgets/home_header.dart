@@ -35,14 +35,22 @@ class _Wordmark extends StatelessWidget {
   Widget build(BuildContext context) {
     // logo.png is the full brand lockup (glyph + "Nectar" wordmark), so it is
     // rendered on its own — no separate text label is needed.
-    return Semantics(
-      label: 'Nectar',
-      image: true,
-      child: Image.asset(
-        AppAssets.logo,
-        height: 30,
-        fit: BoxFit.contain,
-        excludeFromSemantics: true,
+    // The logo PNG (869x287) has ~127px of transparent padding on its left
+    // edge. At height 60 that scales to ~26.5px, so the visible wordmark sits
+    // inset from the widget's left edge. Shifting left by that amount lands the
+    // logo's visible left edge exactly on the screen margin — i.e. flush with
+    // the left edge of the "2000" calories card below it.
+    return Transform.translate(
+      offset: const Offset(-22, 0),
+      child: Semantics(
+        label: 'Nectar',
+        image: true,
+        child: Image.asset(
+          AppAssets.logo,
+          height: 60,
+          fit: BoxFit.contain,
+          excludeFromSemantics: true,
+        ),
       ),
     );
   }

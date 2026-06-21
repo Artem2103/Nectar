@@ -9,7 +9,7 @@ abstract final class AppAssets {
   static const String _base = 'assets';
 
   // ── Brand ────────────────────────────────────────────────────────────────
-  static const String logo = '$_base/logo.png';
+  static const String logo = '$_base/NectarNewLogo.png';
 
   // ── Macronutrient icons ──────────────────────────────────────────────────
   static const String protein = '$_base/meat(proteins).png';

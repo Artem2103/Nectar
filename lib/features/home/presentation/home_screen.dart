@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/constants/app_assets.dart';
 import '../../../core/theme/app_colors.dart';
@@ -7,18 +8,20 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/section_title.dart';
+import '../application/daily_summary_provider.dart';
+import 'widgets/calendar_strip.dart';
 import 'widgets/home_header.dart';
+import 'widgets/nutrition_carousel.dart';
 
-/// The Home tab.
-///
-/// Foundation scope establishes the header and the "Recently uploaded" empty
-/// state. The weekly calendar strip and the swipeable nutrition-stat carousel
-/// (calories / macros / activity) are built in the dedicated Home feature pass.
-class HomeScreen extends StatelessWidget {
+/// The Home tab: header, weekly calendar, the swipeable nutrition-stat carousel
+/// (calories / macros / activity) and the "Recently uploaded" section.
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summary = ref.watch(dailySummaryProvider);
+
     return SafeArea(
       bottom: false,
       child: SingleChildScrollView(
@@ -32,6 +35,10 @@ class HomeScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const HomeHeader(),
+            const SizedBox(height: AppSpacing.lg),
+            CalendarStrip(days: summary.week),
+            const SizedBox(height: AppSpacing.xl),
+            NutritionCarousel(summary: summary),
             const SizedBox(height: AppSpacing.xxxl),
             const SectionTitle('Recently uploaded'),
             const SizedBox(height: AppSpacing.lg),
