@@ -1,3 +1,5 @@
+import 'badge_definition.dart';
+
 /// Immutable snapshot of everything the Progress screen displays.
 ///
 /// Mirrors `DailySummary` on Home: kept free of UI concerns so it can later be
@@ -7,8 +9,7 @@ class ProgressSummary {
   const ProgressSummary({
     required this.dayStreak,
     required this.streakWeek,
-    required this.badgesEarned,
-    required this.badgesTotal,
+    required this.earnedBadgeIds,
     required this.startWeight,
     required this.currentWeight,
     required this.goalWeight,
@@ -23,8 +24,11 @@ class ProgressSummary {
   /// Seven cells (Sun–Sat) describing which days of this week are completed.
   final List<StreakDay> streakWeek;
 
-  final int badgesEarned;
-  final int badgesTotal;
+  /// Ids of the badges the user has unlocked (see `badge_definition.dart`).
+  final Set<String> earnedBadgeIds;
+
+  int get badgesEarned => earnedBadgeIds.length;
+  int get badgesTotal => kAllBadges.length;
 
   // ── Weight journey ─────────────────────────────────────────────────────────
   final double startWeight;
@@ -62,8 +66,7 @@ class ProgressSummary {
         StreakDay(label: 'F', completed: false),
         StreakDay(label: 'S', completed: false),
       ],
-      badgesEarned: 1,
-      badgesTotal: 3,
+      earnedBadgeIds: const {'first_meal'},
       startWeight: 85,
       currentWeight: 74,
       goalWeight: 70,

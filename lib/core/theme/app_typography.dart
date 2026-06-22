@@ -30,7 +30,7 @@ abstract final class AppTypography {
 
   /// Oversized hero numeral — the "2000" calories figure.
   static TextStyle get hero => _base.copyWith(
-        fontSize: 52,
+        fontSize: 46,
         fontWeight: extraBold,
         letterSpacing: -1.5,
         height: 1.0,

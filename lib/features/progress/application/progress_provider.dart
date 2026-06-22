@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../meals/application/meal_provider.dart';
 import '../../meals/domain/meal_entry.dart';
 import '../../profile/application/goals_provider.dart';
+import '../domain/badge_definition.dart';
 import '../domain/progress_summary.dart';
 import '../domain/weight_entry.dart';
 import 'weight_provider.dart';
@@ -42,8 +43,12 @@ final progressSummaryProvider = Provider<AsyncValue<ProgressSummary>>((ref) {
           return AsyncValue.data(ProgressSummary(
             dayStreak: _dayStreak(meals),
             streakWeek: _streakWeek(meals),
-            badgesEarned: _dayStreak(meals) >= 1 ? 1 : 0,
-            badgesTotal: 3,
+            earnedBadgeIds: computeEarnedBadgeIds(
+              meals,
+              weights,
+              goals,
+              _dayStreak(meals),
+            ),
             startWeight: start,
             currentWeight: current,
             goalWeight: goal,

@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../../../app/router/app_routes.dart';
+import '../../../core/supabase/supabase_client.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_typography.dart';
+import '../../../core/widgets/app_background.dart';
+import '../../../core/widgets/app_card.dart';
+import 'widgets/auth_text_field.dart';
+
+/// Email + password sign-in. On success the router's auth redirect fires
+/// automatically and lands the user on Home.
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final _email = TextEditingController();
+  final _password = TextEditingController();
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _email.dispose();
+    _password.dispose();
+    super.dispose();
+  }
+
+  Future<void> _signIn() async {
+    setState(() => _busy = true);
+    try {
+      await supabase.auth.signInWithPassword(
+        email: _email.text.trim(),
+        password: _password.text,
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("Couldn't sign in: $e")));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: AppBackground(
+        child: SafeArea(
+          child: Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(AppSpacing.screenHPadding),
+              child: AppCard(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text('Welcome back', style: AppTypography.sectionTitle),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text('Sign in to continue', style: AppTypography.label),
+                    const SizedBox(height: AppSpacing.xl),
+                    AuthTextField(
+                      controller: _email,
+                      label: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    AuthTextField(
+                      controller: _password,
+                      label: 'Password',
+                      obscure: true,
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
+                    FilledButton(
+                      onPressed: _busy ? null : _signIn,
+                      child: Text(
+                        _busy ? 'Signing in…' : 'Sign in',
+                        style: AppTypography.titleMedium
+                            .copyWith(color: AppColors.onInverse, fontSize: 15),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    TextButton(
+                      onPressed: _busy
+                          ? null
+                          : () => context.goNamed(AppRoutes.registerName),
+                      child: Text('Create account', style: AppTypography.label),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}

@@ -63,4 +63,24 @@ class UserGoals {
         startWeightKg: (json['startWeightKg'] as num).toDouble(),
         goalWeightKg: (json['goalWeightKg'] as num).toDouble(),
       );
+
+  /// Row shape for the `user_goals` table — snake_case keys matching the
+  /// Supabase schema. `user_id` is attached by the repository at write time.
+  Map<String, dynamic> toSupabaseJson() => {
+        'daily_kcal': dailyKcal,
+        'protein_g': proteinG,
+        'carbs_g': carbsG,
+        'fat_g': fatG,
+        'start_weight_kg': startWeightKg,
+        'goal_weight_kg': goalWeightKg,
+      };
+
+  factory UserGoals.fromSupabaseJson(Map<String, dynamic> json) => UserGoals(
+        dailyKcal: (json['daily_kcal'] as num).toInt(),
+        proteinG: (json['protein_g'] as num).toDouble(),
+        carbsG: (json['carbs_g'] as num).toDouble(),
+        fatG: (json['fat_g'] as num).toDouble(),
+        startWeightKg: (json['start_weight_kg'] as num).toDouble(),
+        goalWeightKg: (json['goal_weight_kg'] as num).toDouble(),
+      );
 }

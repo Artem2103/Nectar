@@ -5,19 +5,20 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
 import '../../../../core/widgets/app_card.dart';
+import '../../domain/badge_definition.dart';
 
-/// Badges card: the shield above the "Badges Earned" label and a row of pips
-/// summarising how many badges have been unlocked (`Nectar.pdf`).
+/// Badges card: the shield above an `earned / total` count. Tapping it opens a
+/// dialog listing every badge, with unearned ones greyed out (`Nectar.pdf`).
 class BadgesCard extends StatelessWidget {
-  const BadgesCard({required this.earned, required this.total, super.key});
+  const BadgesCard({required this.earnedIds, super.key});
 
-  final int earned;
-  final int total;
+  final Set<String> earnedIds;
 
   @override
   Widget build(BuildContext context) {
     return AppCard(
       padding: const EdgeInsets.all(AppSpacing.lg),
+      onTap: () => _showBadgesDialog(context, earnedIds),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -30,15 +31,10 @@ class BadgesCard extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.sm),
           Text('Badges Earned', style: AppTypography.label),
-          const SizedBox(height: AppSpacing.lg),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var i = 0; i < total; i++) ...[
-                if (i > 0) const SizedBox(width: AppSpacing.sm),
-                _BadgePip(earned: i < earned),
-              ],
-            ],
+          const SizedBox(height: AppSpacing.sm),
+          Text(
+            '${earnedIds.length} / ${kAllBadges.length}',
+            style: AppTypography.statNumber,
           ),
         ],
       ),
@@ -46,26 +42,59 @@ class BadgesCard extends StatelessWidget {
   }
 }
 
-class _BadgePip extends StatelessWidget {
-  const _BadgePip({required this.earned});
+Future<void> _showBadgesDialog(BuildContext context, Set<String> earnedIds) {
+  return showDialog<void>(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: AppColors.surface,
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Badges', style: AppTypography.sectionTitle),
+            const SizedBox(height: AppSpacing.lg),
+            for (final badge in kAllBadges) ...[
+              _BadgeRow(badge: badge, earned: earnedIds.contains(badge.id)),
+              if (badge != kAllBadges.last)
+                const SizedBox(height: AppSpacing.md),
+            ],
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
+class _BadgeRow extends StatelessWidget {
+  const _BadgeRow({required this.badge, required this.earned});
+
+  final BadgeDefinition badge;
   final bool earned;
-
-  static const double _size = 16;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: _size,
-      height: _size,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: earned ? AppColors.surfaceInverse : AppColors.surface,
-        border: earned ? null : Border.all(color: AppColors.border, width: 1.5),
+    return Opacity(
+      opacity: earned ? 1 : 0.35,
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(badge.iconEmoji, style: const TextStyle(fontSize: 28)),
+          const SizedBox(width: AppSpacing.md),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(badge.title, style: AppTypography.titleMedium),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(badge.description, style: AppTypography.label),
+              ],
+            ),
+          ),
+        ],
       ),
-      child: earned
-          ? const Icon(Icons.star_rounded, size: 10, color: AppColors.onInverse)
-          : null,
     );
   }
 }

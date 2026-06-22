@@ -63,4 +63,34 @@ class MealEntry {
         sugarG: (json['sugarG'] as num?)?.toDouble() ?? 0,
         sodiumMg: (json['sodiumMg'] as num?)?.toDouble() ?? 0,
       );
+
+  /// Row shape for the `meal_entries` table — snake_case keys matching the
+  /// Supabase schema. `user_id` is attached by the repository at write time.
+  Map<String, dynamic> toSupabaseJson() => {
+        'id': id,
+        'logged_at': timestamp.toIso8601String(),
+        'name': name,
+        'image_path': imagePath,
+        'kcal': kcal,
+        'protein_g': proteinG,
+        'carbs_g': carbsG,
+        'fat_g': fatG,
+        'fiber_g': fiberG,
+        'sugar_g': sugarG,
+        'sodium_mg': sodiumMg,
+      };
+
+  factory MealEntry.fromSupabaseJson(Map<String, dynamic> json) => MealEntry(
+        id: json['id'] as String,
+        timestamp: DateTime.parse(json['logged_at'] as String),
+        name: json['name'] as String,
+        imagePath: json['image_path'] as String?,
+        kcal: (json['kcal'] as num).toInt(),
+        proteinG: (json['protein_g'] as num).toDouble(),
+        carbsG: (json['carbs_g'] as num).toDouble(),
+        fatG: (json['fat_g'] as num).toDouble(),
+        fiberG: (json['fiber_g'] as num?)?.toDouble() ?? 0,
+        sugarG: (json['sugar_g'] as num?)?.toDouble() ?? 0,
+        sodiumMg: (json['sodium_mg'] as num?)?.toDouble() ?? 0,
+      );
 }

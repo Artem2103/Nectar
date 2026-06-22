@@ -1,55 +1,49 @@
-import 'dart:convert';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/supabase/supabase_client.dart';
 import '../domain/meal_entry.dart';
 
-/// Owns the list of logged meals: hydrates it from SharedPreferences on build
-/// and persists every mutation back as a JSON string.
+/// Owns the list of logged meals: hydrates it from Supabase on build and writes
+/// every mutation straight through to the `meal_entries` table.
 ///
 /// Doubles as the feature's [AsyncNotifier] so widgets read the list (and react
 /// to changes) through a single [mealRepositoryProvider] seam.
 class MealRepository extends AsyncNotifier<List<MealEntry>> {
-  static const String _key = 'nectar_meals';
+  String get _uid => supabase.auth.currentUser!.id;
 
   @override
   Future<List<MealEntry>> build() => load();
 
-  /// Reads and decodes the persisted meals (empty list if none stored yet).
+  /// Reads this user's meals, oldest → newest.
   Future<List<MealEntry>> load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final raw = prefs.getString(_key);
-    if (raw == null || raw.isEmpty) return const [];
-    final decoded = jsonDecode(raw) as List<dynamic>;
-    return decoded
-        .map((e) => MealEntry.fromJson(e as Map<String, dynamic>))
+    final rows = await supabase
+        .from('meal_entries')
+        .select()
+        .eq('user_id', _uid)
+        .order('logged_at');
+    return rows
+        .map((e) => MealEntry.fromSupabaseJson(e))
         .toList();
   }
 
-  /// Encodes and writes [meals] to SharedPreferences.
-  Future<void> save(List<MealEntry> meals) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(
-      _key,
-      jsonEncode(meals.map((m) => m.toJson()).toList()),
-    );
-  }
-
-  /// Appends [entry], persists, and publishes the new state.
+  /// Inserts (or updates) [entry] for the current user, then republishes state.
   Future<void> addMeal(MealEntry entry) async {
-    final current = state.value ?? await load();
-    final updated = [...current, entry];
-    await save(updated);
-    state = AsyncData(updated);
+    await supabase
+        .from('meal_entries')
+        .upsert({...entry.toSupabaseJson(), 'user_id': _uid});
+    final current = state.value ?? const <MealEntry>[];
+    state = AsyncData([...current.where((m) => m.id != entry.id), entry]);
   }
 
-  /// Removes the entry with [id], persists, and publishes the new state.
+  /// Removes the entry with [id], then republishes state.
   Future<void> deleteMeal(String id) async {
-    final current = state.value ?? await load();
-    final updated = current.where((m) => m.id != id).toList();
-    await save(updated);
-    state = AsyncData(updated);
+    await supabase
+        .from('meal_entries')
+        .delete()
+        .eq('id', id)
+        .eq('user_id', _uid);
+    final current = state.value ?? const <MealEntry>[];
+    state = AsyncData(current.where((m) => m.id != id).toList());
   }
 
   /// Entries logged on the current calendar day, newest first.

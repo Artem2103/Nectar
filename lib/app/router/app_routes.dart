@@ -14,10 +14,18 @@ abstract final class AppRoutes {
   /// Full-screen meal-capture flow, pushed above the tab shell.
   static const String addMeal = '/add-meal';
 
+  // Auth flow — plain routes outside the tab shell.
+  static const String login = '/login';
+  static const String register = '/register';
+  static const String onboarding = '/onboarding';
+
   // Named-route identifiers (used by `goNamed`).
   static const String homeName = 'home';
   static const String progressName = 'progress';
   static const String groupsName = 'groups';
   static const String profileName = 'profile';
   static const String addMealName = 'add-meal';
+  static const String loginName = 'login';
+  static const String registerName = 'register';
+  static const String onboardingName = 'onboarding';
 }

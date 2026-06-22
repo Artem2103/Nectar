@@ -8,6 +8,7 @@ import '../domain/progress_summary.dart';
 import '../application/progress_provider.dart';
 import 'widgets/badges_card.dart';
 import 'widgets/current_weight_card.dart';
+import 'widgets/log_weight_sheet.dart';
 import 'widgets/streak_card.dart';
 import 'widgets/weight_chart_card.dart';
 
@@ -53,13 +54,13 @@ class ProgressScreen extends ConsumerWidget {
 }
 
 /// The populated Progress body, rendered once the summary has loaded.
-class _ProgressContent extends StatelessWidget {
+class _ProgressContent extends ConsumerWidget {
   const _ProgressContent({required this.summary});
 
   final ProgressSummary summary;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -70,10 +71,7 @@ class _ProgressContent extends StatelessWidget {
               Expanded(child: StreakCard(week: summary.streakWeek)),
               const SizedBox(width: AppSpacing.md),
               Expanded(
-                child: BadgesCard(
-                  earned: summary.badgesEarned,
-                  total: summary.badgesTotal,
-                ),
+                child: BadgesCard(earnedIds: summary.earnedBadgeIds),
               ),
             ],
           ),
@@ -81,10 +79,11 @@ class _ProgressContent extends StatelessWidget {
         const SizedBox(height: AppSpacing.lg),
         CurrentWeightCard(
           summary: summary,
-          onLogWeight: () {
-            // The log-weight flow is introduced in a later pass; the action
-            // is wired here so the card reads as live in the meantime.
-          },
+          onLogWeight: () => showLogWeightSheet(
+            context,
+            ref,
+            currentWeight: summary.currentWeight,
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         WeightChartCard(
