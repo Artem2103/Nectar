@@ -17,6 +17,7 @@ abstract final class AppRoutes {
   // Auth flow — plain routes outside the tab shell.
   static const String login = '/login';
   static const String register = '/register';
+  static const String verifyEmail = '/verify-email';
   static const String onboarding = '/onboarding';
 
   // Named-route identifiers (used by `goNamed`).
@@ -27,5 +28,6 @@ abstract final class AppRoutes {
   static const String addMealName = 'add-meal';
   static const String loginName = 'login';
   static const String registerName = 'register';
+  static const String verifyEmailName = 'verify-email';
   static const String onboardingName = 'onboarding';
 }

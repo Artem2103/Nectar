@@ -42,11 +42,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
     setState(() => _busy = true);
     try {
-      await supabase.auth.signUp(
-        email: _email.text.trim(),
+      final email = _email.text.trim();
+      final res = await supabase.auth.signUp(
+        email: email,
         password: _password.text,
       );
-      if (mounted) context.goNamed(AppRoutes.onboardingName);
+      if (!mounted) return;
+      if (res.session == null) {
+        // Email confirmation is enabled: sign-up returned no session, so the
+        // user must confirm via the emailed link before any authenticated
+        // work (saving goals) can run. Route them to the verify screen rather
+        // than into onboarding, where the upsert would fail with
+        // AuthSessionMissingException.
+        context.goNamed(AppRoutes.verifyEmailName, extra: email);
+      } else {
+        context.goNamed(AppRoutes.onboardingName);
+      }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)

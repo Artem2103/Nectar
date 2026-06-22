@@ -7,6 +7,7 @@ import '../../core/supabase/supabase_client.dart';
 import '../../features/auth/presentation/login_screen.dart';
 import '../../features/auth/presentation/onboarding_screen.dart';
 import '../../features/auth/presentation/register_screen.dart';
+import '../../features/auth/presentation/verify_email_screen.dart';
 import '../../features/groups/presentation/groups_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/meals/presentation/add_meal_screen.dart';
@@ -34,6 +35,7 @@ abstract final class AppRouter {
         final loggedIn = supabase.auth.currentUser != null;
         final onAuth = state.matchedLocation == AppRoutes.login ||
             state.matchedLocation == AppRoutes.register ||
+            state.matchedLocation == AppRoutes.verifyEmail ||
             state.matchedLocation == AppRoutes.onboarding;
         if (!loggedIn && !onAuth) return AppRoutes.login;
         if (loggedIn && state.matchedLocation == AppRoutes.login) {
@@ -75,6 +77,12 @@ abstract final class AppRouter {
           path: AppRoutes.register,
           name: AppRoutes.registerName,
           builder: (context, state) => const RegisterScreen(),
+        ),
+        GoRoute(
+          path: AppRoutes.verifyEmail,
+          name: AppRoutes.verifyEmailName,
+          builder: (context, state) =>
+              VerifyEmailScreen(email: state.extra as String? ?? ''),
         ),
         GoRoute(
           path: AppRoutes.onboarding,
