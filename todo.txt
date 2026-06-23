@@ -41,7 +41,7 @@
 - [x] Add packages: supabase_flutter, image_picker, http, uuid
 - [x] MealEntry model  (id, timestamp, name, imagePath, kcal, protein, carbs, fat, fiber, sugar, sodium)
 - [x] WeightEntry model  (id, timestamp, valueKg)
-- [x] UserGoals model  (dailyKcal, proteinG, carbsG, fatG, startWeightKg, goalWeightKg)
+- [x] UserGoals model  (dailyKcal, proteinG, carbsG, fatG, fiberG, sugarG, sodiumMg, startWeightKg, goalWeightKg)
 - [x] MealRepository  — CRUD, persisted to Supabase `meal_entries` (RLS-scoped per user)
 - [x] WeightRepository — CRUD, persisted to Supabase `weight_entries` (RLS-scoped per user)
 - [x] GoalsRepository  — read/upsert UserGoals to Supabase `user_goals` (RLS-scoped per user)
@@ -52,7 +52,7 @@
 ## Phase 2 — Add Meal Flow
 
 - [x] Wire FAB → /add-meal route (GoRouter push, not shell branch)
-- [x] AddMealScreen: manual form (meal name, kcal, protein, carbs, fat)
+- [x] AddMealScreen: manual form (meal name, kcal, protein, carbs, fat, + optional fiber, sugar, sodium)
 - [x] "Analyse photo" button: image_picker → send image to Claude API → auto-fill form fields
 - [x] AddMealScreen shows AI-parsed result, allows edits, confirm button saves to MealRepository
 - [x] On save: pop back to Home; provider invalidation triggers reactive rebuild
@@ -90,7 +90,7 @@
 ## Polish
 
 - [ ] Animations
-- [ ] Dark mode
+- [x] Dark mode (bespoke widgets repaint via NectarColors ThemeExtension + context.colors)
 - [ ] Different Languages
 - [ ] Accessibility
 
@@ -120,6 +120,11 @@ Restructure Profile into a hub: header → grouped settings list (tap row → de
 - [x] Move goals form into a "Goals & targets" detail screen (GoalsScreen,
       pushed via /goals; macro targets already captured here)
 - [x] Capture macro targets here (closes onboarding gap — protein/carbs/fat)
+- [x] Capture micronutrient targets here (fiber / sugar / sodium) — feed the
+      carousel's 2nd page (was hardcoded constants in dailySummaryProvider).
+      REQUIRES adding fiber_g, sugar_g, sodium_mg columns to Supabase `user_goals`
+      (updateGoals upserts the full row, so writes fail until the columns exist;
+      reads are null-tolerant).
 - [~] Units preference (metric / imperial — kg/lb, ml/oz)
       Preference is stored + selectable in Profile, but weight/volume displays
       don't convert yet — wire UnitSystem into Progress/weight UI next.
@@ -127,7 +132,7 @@ Restructure Profile into a hub: header → grouped settings list (tap row → de
 
 ### Preferences
 - [x] Theme: light / dark / system (picker wired to themeController +
-      MaterialApp.themeMode; full dark repaint still pending — see Dark mode)
+      MaterialApp.themeMode; full dark repaint shipped — see Dark mode)
 - [ ] Language picker (ties into i18n polish item)
 - [~] Notifications: meal reminders, weigh-in reminders, streak nudges (toggles)
       Toggles persist via settings; actual local-notification scheduling not
@@ -155,7 +160,46 @@ Restructure Profile into a hub: header → grouped settings list (tap row → de
 - [x] Reusable settings-list widgets (section header, nav row, toggle row, value row)
       lib/features/profile/presentation/widgets/settings_widgets.dart:
       SettingsSection / SettingsNavRow / SettingsToggleRow / SettingsValueRow.
+
+---
+
+## Session 2026-06-24 — micronutrient goals + dark-mode repaint
+
+Done this session:
+
+- [x] UserGoals: added fiberG / sugarG / sodiumMg (defaults 30 g / 50 g / 2300 mg);
+      copyWith + toJson/fromJson + toSupabaseJson/fromSupabaseJson all updated and
+      null-tolerant on read.
+- [x] GoalsScreen form: new second macro row — Fiber g / Sugar g / Sodium mg —
+      under the protein/carbs/fat row; wired to controllers, dispose, and save.
+- [x] dailySummaryProvider: carousel's 2nd page (fiber/sugar/sodium "left") now
+      reads UserGoals instead of the deleted hardcoded _fiberGoalG/_sugarGoalG/
+      _sodiumGoalMg constants; guards divide-by-zero on zero goals.
+- [x] AddMealScreen: optional Fiber / Sugar / Sodium fields (blank → 0 via new
+      _Field.optional flag so they don't block save); saved onto MealEntry.
+- [x] meal_analyser: MealAnalysis gained fiberG/sugarG/sodiumMg; vision prompt
+      asks for them (grams; sodium in mg) and they auto-fill on "Analyse photo".
+- [x] Dark mode now repaints bespoke widgets:
+      * New NectarColors ThemeExtension (lib/core/theme/nectar_colors.dart) holds
+        the flipping surface/text/line tokens; registered in AppTheme.light/dark
+        via extensions:. Access through context.colors.<token> (NectarColorsX).
+      * Migrated ~25 widgets from AppColors.<flippingToken> → context.colors.*,
+        de-consting decorations as needed; two CustomPainters (weight chart, day
+        ring) now take their colours as constructor params.
+      * AppTypography._base no longer bakes a colour — primary text follows the
+        themed default text style; AppTheme.light applies bodyColor/displayColor.
+      * Brand colours (accent/streak/water) + mid-grey textSecondary/textTertiary
+        stay AppColors constants. White icons on always-orange backgrounds (home
+        delete swipe, streak check) intentionally kept AppColors.onInverse.
+- [x] flutter analyze clean (only the pre-existing anonKey deprecation in main.dart).
+
+ACTION REQUIRED (Supabase, manual): add columns to `user_goals` before saving
+goals will work —
+    alter table user_goals
+      add column fiber_g   double precision default 30,
+      add column sugar_g   double precision default 50,
+      add column sodium_mg double precision default 2300;
 - [x] Theme controller (Riverpod) wired to MaterialApp themeMode
-      themeControllerProvider drives MaterialApp.themeMode; AppTheme.dark added
-      as a baseline. Bespoke token-driven widgets still need migrating for a
-      full dark repaint (see Dark mode polish item).
+      themeControllerProvider drives MaterialApp.themeMode; AppTheme.dark added.
+      Bespoke token-driven widgets now migrated to NectarColors/context.colors,
+      so dark mode fully repaints (see Dark mode polish item).
