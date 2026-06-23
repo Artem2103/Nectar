@@ -138,6 +138,16 @@ Restructure Profile into a hub: header → grouped settings list (tap row → de
 - [ ] Rate the app / share
 
 ### Foundation needed
-- [ ] Settings model + repository (persist preferences to Supabase + local cache)
-- [ ] Reusable settings-list widgets (section header, nav row, toggle row, value row)
-- [ ] Theme controller (Riverpod) wired to MaterialApp themeMode
+- [x] Settings model + repository (persist preferences to Supabase + local cache)
+      AppSettings (theme/units/notification toggles); SettingsRepository =
+      Supabase `user_settings` row + shared_preferences cache (remote wins,
+      cache fallback offline). NOTE: requires a `user_settings` table in
+      Supabase (RLS per user) with columns: user_id, theme_mode, units,
+      meal_reminders, weigh_in_reminders, streak_nudges.
+- [x] Reusable settings-list widgets (section header, nav row, toggle row, value row)
+      lib/features/profile/presentation/widgets/settings_widgets.dart:
+      SettingsSection / SettingsNavRow / SettingsToggleRow / SettingsValueRow.
+- [x] Theme controller (Riverpod) wired to MaterialApp themeMode
+      themeControllerProvider drives MaterialApp.themeMode; AppTheme.dark added
+      as a baseline. Bespoke token-driven widgets still need migrating for a
+      full dark repaint (see Dark mode polish item).

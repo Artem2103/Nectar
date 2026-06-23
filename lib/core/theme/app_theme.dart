@@ -71,6 +71,71 @@ abstract final class AppTheme {
     );
   }
 
+  /// Baseline dark counterpart to [light], wired up via `MaterialApp.darkTheme`
+  /// so the theme controller's themeMode has something to switch to. Material
+  /// surfaces (scaffold, stock widgets, text) adapt; bespoke token-driven
+  /// widgets still need migrating as part of the "Dark mode" polish item.
+  static ThemeData get dark {
+    const colorScheme = ColorScheme.dark(
+      primary: AppColors.accent,
+      onPrimary: AppColors.onInverse,
+      secondary: AppColors.streak,
+      onSecondary: AppColors.onInverse,
+      surface: AppColors.surfaceDark,
+      onSurface: AppColors.textPrimaryDark,
+      surfaceContainerHighest: AppColors.surfaceMutedDark,
+      outline: AppColors.borderDark,
+      outlineVariant: AppColors.borderDark,
+      error: Color(0xFFE5484D),
+    );
+
+    final textTheme =
+        _buildTextTheme().apply(bodyColor: AppColors.textPrimaryDark, displayColor: AppColors.textPrimaryDark);
+
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: colorScheme,
+      scaffoldBackgroundColor: AppColors.backgroundDark,
+      fontFamily: AppTypography.fontFamily,
+      textTheme: textTheme,
+      splashFactory: InkSparkle.splashFactory,
+      visualDensity: VisualDensity.standard,
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.transparent,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        centerTitle: false,
+      ),
+      cardTheme: CardThemeData(
+        color: AppColors.surfaceDark,
+        surfaceTintColor: Colors.transparent,
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(borderRadius: AppRadii.xlAll),
+      ),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.surfaceInverseDark,
+          foregroundColor: AppColors.onInverseDark,
+          textStyle: AppTypography.titleMedium,
+          elevation: 0,
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+          shape: const RoundedRectangleBorder(borderRadius: AppRadii.pillAll),
+        ),
+      ),
+      dividerTheme: const DividerThemeData(
+        color: AppColors.borderDark,
+        thickness: 1,
+        space: 1,
+      ),
+      iconTheme: const IconThemeData(color: AppColors.textPrimaryDark),
+      splashColor: Colors.transparent,
+      highlightColor: Colors.transparent,
+    );
+  }
+
   static TextTheme _buildTextTheme() {
     return TextTheme(
       displayLarge: AppTypography.hero,

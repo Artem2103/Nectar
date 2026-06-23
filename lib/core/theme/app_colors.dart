@@ -57,6 +57,31 @@ abstract final class AppColors {
   /// Dark data line used by charts.
   static const Color chartLine = Color(0xFF3A3A3C);
 
+  // ── Dark scheme ──────────────────────────────────────────────────────────
+  // Baseline dark tokens consumed by [AppTheme.dark] and the themeMode wiring.
+  // Bespoke widgets still reference the light tokens above directly, so the
+  // full dark repaint is tracked as the "Dark mode" polish item.
+  /// Dark base background.
+  static const Color backgroundDark = Color(0xFF0E0E11);
+
+  /// Dark card / elevated-surface colour.
+  static const Color surfaceDark = Color(0xFF1A1A1F);
+
+  /// Dark muted, recessed surface.
+  static const Color surfaceMutedDark = Color(0xFF222228);
+
+  /// Light surface used for inverse elements (FAB, primary pills) on dark.
+  static const Color surfaceInverseDark = Color(0xFFF5F5F7);
+
+  /// Primary text on dark surfaces.
+  static const Color textPrimaryDark = Color(0xFFF5F5F7);
+
+  /// Text/icon colour drawn on top of [surfaceInverseDark].
+  static const Color onInverseDark = Color(0xFF111114);
+
+  /// Hairline borders and neutral tracks on dark surfaces.
+  static const Color borderDark = Color(0xFF2C2C33);
+
   // ── Decorative ───────────────────────────────────────────────────────────
   /// Soft gradient pair behind the maintenance illustration.
   static const Color illustrationGlowStart = Color(0xFFFFEAEF);

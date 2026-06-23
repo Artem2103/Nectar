@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'app/app.dart';
+import 'core/storage/preferences_provider.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +24,16 @@ Future<void> main() async {
 
   await Supabase.initialize(url: supabaseUrl, anonKey: supabaseAnonKey);
 
+  // Loaded up front so preferences (notably the theme) are readable
+  // synchronously on the first frame via [sharedPreferencesProvider].
+  final prefs = await SharedPreferences.getInstance();
+
   // ProviderScope hosts all Riverpod state for the app; feature providers are
   // registered lazily from within their own feature folders.
-  runApp(const ProviderScope(child: NectarApp()));
+  runApp(
+    ProviderScope(
+      overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+      child: const NectarApp(),
+    ),
+  );
 }
