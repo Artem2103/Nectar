@@ -33,7 +33,7 @@ class MealAnalysis {
         proteinG: (json['proteinG'] as num).toDouble(),
         carbsG: (json['carbsG'] as num).toDouble(),
         fatG: (json['fatG'] as num).toDouble(),
-        fiberG: (json['fiberG'] as num?)?.toDouble() ?? 0,
+        fiberG: (json['fiber'] as num?)?.toDouble() ?? 0,
         sugarG: (json['sugarG'] as num?)?.toDouble() ?? 0,
         sodiumMg: (json['sodiumMg'] as num?)?.toDouble() ?? 0,
       );
