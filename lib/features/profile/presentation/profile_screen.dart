@@ -1,26 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
+import '../../../app/router/app_routes.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_title.dart';
 import '../application/goals_provider.dart';
-import '../domain/user_goals.dart';
+import '../application/settings_provider.dart';
+import '../application/theme_controller.dart';
+import '../domain/app_settings.dart';
+import 'widgets/settings_widgets.dart';
 
-/// The Profile tab: account header, an editor for the user's nutrition and
-/// weight goals, and a sign-out action.
+/// The Profile tab, structured as a settings hub: an account header above
+/// grouped setting rows that open detail screens / sheets, ending in sign-out.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final goalsAsync = ref.watch(goalsProvider);
     final email = supabase.auth.currentUser?.email ?? '';
+    final settings = ref.watch(settingsProvider).value ?? AppSettings.defaults();
+    final themeMode = ref.watch(themeControllerProvider);
+    final dailyKcal = ref.watch(goalsProvider).value?.dailyKcal;
 
     return SafeArea(
       bottom: false,
@@ -37,19 +42,69 @@ class ProfileScreen extends ConsumerWidget {
             const ScreenTitle('Profile'),
             const SizedBox(height: AppSpacing.xl),
             _Header(email: email),
-            const SizedBox(height: AppSpacing.lg),
-            goalsAsync.when(
-              loading: () => const SizedBox(
-                height: 200,
-                child: Center(child: CircularProgressIndicator()),
-              ),
-              error: (e, _) => Text(
-                "Couldn't load your goals: $e",
-                style: AppTypography.label,
-              ),
-              data: (goals) => _GoalsForm(goals: goals),
+            const SizedBox(height: AppSpacing.xl),
+            SettingsSection(
+              title: 'Goals & nutrition',
+              children: [
+                SettingsNavRow(
+                  icon: Icons.flag_rounded,
+                  title: 'Goals & targets',
+                  subtitle: 'Calories, macros and weight journey',
+                  trailingValue:
+                      dailyKcal == null ? null : '$dailyKcal kcal',
+                  onTap: () => context.pushNamed(AppRoutes.goalsName),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.lg),
+            SettingsSection(
+              title: 'Preferences',
+              children: [
+                SettingsNavRow(
+                  icon: Icons.dark_mode_rounded,
+                  title: 'Appearance',
+                  trailingValue: _themeLabel(themeMode),
+                  onTap: () => _pickTheme(context, ref, themeMode),
+                ),
+                SettingsNavRow(
+                  icon: Icons.straighten_rounded,
+                  title: 'Units',
+                  trailingValue: _unitsLabel(settings.units),
+                  onTap: () => _pickUnits(context, ref, settings),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            SettingsSection(
+              title: 'Notifications',
+              children: [
+                SettingsToggleRow(
+                  icon: Icons.restaurant_rounded,
+                  title: 'Meal reminders',
+                  value: settings.mealReminders,
+                  onChanged: (v) => ref
+                      .read(settingsProvider.notifier)
+                      .updateSettings(settings.copyWith(mealReminders: v)),
+                ),
+                SettingsToggleRow(
+                  icon: Icons.monitor_weight_rounded,
+                  title: 'Weigh-in reminders',
+                  value: settings.weighInReminders,
+                  onChanged: (v) => ref
+                      .read(settingsProvider.notifier)
+                      .updateSettings(settings.copyWith(weighInReminders: v)),
+                ),
+                SettingsToggleRow(
+                  icon: Icons.local_fire_department_rounded,
+                  title: 'Streak nudges',
+                  value: settings.streakNudges,
+                  onChanged: (v) => ref
+                      .read(settingsProvider.notifier)
+                      .updateSettings(settings.copyWith(streakNudges: v)),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.xl),
             TextButton(
               onPressed: () => supabase.auth.signOut(),
               style: TextButton.styleFrom(
@@ -67,6 +122,110 @@ class ProfileScreen extends ConsumerWidget {
       ),
     );
   }
+
+  static String _themeLabel(ThemeMode mode) => switch (mode) {
+        ThemeMode.system => 'System',
+        ThemeMode.light => 'Light',
+        ThemeMode.dark => 'Dark',
+      };
+
+  static String _unitsLabel(UnitSystem units) => switch (units) {
+        UnitSystem.metric => 'Metric (kg)',
+        UnitSystem.imperial => 'Imperial (lb)',
+      };
+
+  Future<void> _pickTheme(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeMode current,
+  ) async {
+    final choice = await _showOptionSheet<ThemeMode>(
+      context: context,
+      title: 'Appearance',
+      options: [
+        for (final mode in ThemeMode.values)
+          _Option(value: mode, label: _themeLabel(mode), selected: mode == current),
+      ],
+    );
+    if (choice != null) {
+      await ref.read(themeControllerProvider.notifier).setThemeMode(choice);
+    }
+  }
+
+  Future<void> _pickUnits(
+    BuildContext context,
+    WidgetRef ref,
+    AppSettings settings,
+  ) async {
+    final choice = await _showOptionSheet<UnitSystem>(
+      context: context,
+      title: 'Units',
+      options: [
+        for (final units in UnitSystem.values)
+          _Option(
+            value: units,
+            label: _unitsLabel(units),
+            selected: units == settings.units,
+          ),
+      ],
+    );
+    if (choice != null && choice != settings.units) {
+      await ref
+          .read(settingsProvider.notifier)
+          .updateSettings(settings.copyWith(units: choice));
+    }
+  }
+}
+
+/// A single choice in an [_showOptionSheet].
+class _Option<T> {
+  const _Option({
+    required this.value,
+    required this.label,
+    required this.selected,
+  });
+
+  final T value;
+  final String label;
+  final bool selected;
+}
+
+/// Shows a simple single-select bottom sheet and returns the chosen value, or
+/// `null` if dismissed.
+Future<T?> _showOptionSheet<T>({
+  required BuildContext context,
+  required String title,
+  required List<_Option<T>> options,
+}) {
+  return showModalBottomSheet<T>(
+    context: context,
+    builder: (context) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(
+              AppSpacing.xl,
+              AppSpacing.lg,
+              AppSpacing.xl,
+              AppSpacing.sm,
+            ),
+            child: Text(title, style: AppTypography.titleMedium),
+          ),
+          for (final option in options)
+            ListTile(
+              title: Text(option.label, style: AppTypography.body),
+              trailing: option.selected
+                  ? const Icon(Icons.check_rounded, color: AppColors.accent)
+                  : null,
+              onTap: () => Navigator.pop(context, option.value),
+            ),
+          const SizedBox(height: AppSpacing.sm),
+        ],
+      ),
+    ),
+  );
 }
 
 class _Header extends StatelessWidget {
@@ -122,165 +281,6 @@ class _Header extends StatelessWidget {
                   ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _GoalsForm extends ConsumerStatefulWidget {
-  const _GoalsForm({required this.goals});
-
-  final UserGoals goals;
-
-  @override
-  ConsumerState<_GoalsForm> createState() => _GoalsFormState();
-}
-
-class _GoalsFormState extends ConsumerState<_GoalsForm> {
-  late final _dailyKcal =
-      TextEditingController(text: widget.goals.dailyKcal.toString());
-  late final _protein =
-      TextEditingController(text: _fmt(widget.goals.proteinG));
-  late final _carbs = TextEditingController(text: _fmt(widget.goals.carbsG));
-  late final _fat = TextEditingController(text: _fmt(widget.goals.fatG));
-  late final _startWeight =
-      TextEditingController(text: _fmt(widget.goals.startWeightKg));
-  late final _goalWeight =
-      TextEditingController(text: _fmt(widget.goals.goalWeightKg));
-  bool _busy = false;
-
-  static String _fmt(double v) =>
-      v == v.truncateToDouble() ? v.toStringAsFixed(0) : v.toString();
-
-  @override
-  void dispose() {
-    for (final c in [
-      _dailyKcal,
-      _protein,
-      _carbs,
-      _fat,
-      _startWeight,
-      _goalWeight,
-    ]) {
-      c.dispose();
-    }
-    super.dispose();
-  }
-
-  Future<void> _save() async {
-    final edited = widget.goals.copyWith(
-      dailyKcal: int.tryParse(_dailyKcal.text),
-      proteinG: double.tryParse(_protein.text),
-      carbsG: double.tryParse(_carbs.text),
-      fatG: double.tryParse(_fat.text),
-      startWeightKg: double.tryParse(_startWeight.text),
-      goalWeightKg: double.tryParse(_goalWeight.text),
-    );
-    setState(() => _busy = true);
-    try {
-      await ref.read(goalsProvider.notifier).updateGoals(edited);
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(const SnackBar(content: Text('Goals saved')));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(SnackBar(content: Text("Couldn't save goals: $e")));
-      }
-    } finally {
-      if (mounted) setState(() => _busy = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AppCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('Your goals', style: AppTypography.titleMedium),
-          const SizedBox(height: AppSpacing.lg),
-          _GoalField(
-              controller: _dailyKcal, label: 'Daily calories', integer: true),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(child: _GoalField(controller: _protein, label: 'Protein g')),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(child: _GoalField(controller: _carbs, label: 'Carbs g')),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(child: _GoalField(controller: _fat, label: 'Fat g')),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.md),
-          Row(
-            children: [
-              Expanded(
-                child: _GoalField(
-                    controller: _startWeight, label: 'Start weight kg'),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _GoalField(
-                    controller: _goalWeight, label: 'Goal weight kg'),
-              ),
-            ],
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          FilledButton(
-            onPressed: _busy ? null : _save,
-            child: Text(
-              _busy ? 'Saving…' : 'Save goals',
-              style: AppTypography.titleMedium
-                  .copyWith(color: AppColors.onInverse, fontSize: 15),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// A compact numeric field matching the app's form styling.
-class _GoalField extends StatelessWidget {
-  const _GoalField({
-    required this.controller,
-    required this.label,
-    this.integer = false,
-  });
-
-  final TextEditingController controller;
-  final String label;
-  final bool integer;
-
-  @override
-  Widget build(BuildContext context) {
-    return TextField(
-      controller: controller,
-      keyboardType: TextInputType.numberWithOptions(decimal: !integer),
-      inputFormatters: [
-        FilteringTextInputFormatter.allow(
-          integer ? RegExp(r'[0-9]') : RegExp(r'[0-9.]'),
-        ),
-      ],
-      style: AppTypography.body,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: AppTypography.label,
-        filled: true,
-        fillColor: AppColors.surface,
-        border: const OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
-        ),
-        enabledBorder: const OutlineInputBorder(
-          borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
-        ),
       ),
     );
   }

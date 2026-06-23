@@ -107,6 +107,8 @@
 ## Phase 5 — Profile expansion (currently just goals form + sign out)
 
 Restructure Profile into a hub: header → grouped settings list (tap row → detail screen / sheet).
+- [x] Hub layout shipped: header + grouped SettingsSection rows + sign out
+      (ProfileScreen rebuilt on the settings-list widgets).
 
 ### Account & profile
 - [ ] Editable profile: display name, avatar photo (upload to Supabase Storage), email
@@ -115,15 +117,21 @@ Restructure Profile into a hub: header → grouped settings list (tap row → de
 - [ ] Delete account (with confirmation)
 
 ### Goals & nutrition
-- [ ] Move goals form into a "Goals & targets" detail screen
-- [ ] Capture macro targets here (closes onboarding gap — protein/carbs/fat)
-- [ ] Units preference (metric / imperial — kg/lb, ml/oz)
+- [x] Move goals form into a "Goals & targets" detail screen (GoalsScreen,
+      pushed via /goals; macro targets already captured here)
+- [x] Capture macro targets here (closes onboarding gap — protein/carbs/fat)
+- [~] Units preference (metric / imperial — kg/lb, ml/oz)
+      Preference is stored + selectable in Profile, but weight/volume displays
+      don't convert yet — wire UnitSystem into Progress/weight UI next.
 - [ ] Goal type (lose / maintain / gain) + weekly rate
 
 ### Preferences
-- [ ] Theme: light / dark / system (ties into Dark mode polish item)
+- [x] Theme: light / dark / system (picker wired to themeController +
+      MaterialApp.themeMode; full dark repaint still pending — see Dark mode)
 - [ ] Language picker (ties into i18n polish item)
-- [ ] Notifications: meal reminders, weigh-in reminders, streak nudges (toggles)
+- [~] Notifications: meal reminders, weigh-in reminders, streak nudges (toggles)
+      Toggles persist via settings; actual local-notification scheduling not
+      wired yet.
 - [ ] Start-of-week, date/time format
 
 ### Subscription & billing
