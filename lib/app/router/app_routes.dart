@@ -14,6 +14,9 @@ abstract final class AppRoutes {
   /// Full-screen meal-capture flow, pushed above the tab shell.
   static const String addMeal = '/add-meal';
 
+  /// Goals & targets editor, pushed above the tab shell from Profile.
+  static const String goals = '/goals';
+
   // Auth flow — plain routes outside the tab shell.
   static const String login = '/login';
   static const String register = '/register';
@@ -26,6 +29,7 @@ abstract final class AppRoutes {
   static const String groupsName = 'groups';
   static const String profileName = 'profile';
   static const String addMealName = 'add-meal';
+  static const String goalsName = 'goals';
   static const String loginName = 'login';
   static const String registerName = 'register';
   static const String verifyEmailName = 'verify-email';

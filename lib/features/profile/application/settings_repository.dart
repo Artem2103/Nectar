@@ -42,16 +42,22 @@ class SettingsRepository extends AsyncNotifier<AppSettings> {
     }
   }
 
-  /// Upserts [settings] for the current user, refreshes the cache and publishes
-  /// them as the new state.
+  /// Updates [settings]: writes the local cache and publishes them immediately
+  /// so the UI reacts at once, then mirrors them to Supabase. A failed remote
+  /// write is tolerated (e.g. offline, or the `user_settings` table not yet
+  /// provisioned) — the cache remains authoritative, matching [load].
   Future<void> updateSettings(AppSettings settings) async {
     await _writeCache(settings);
     state = AsyncData(settings);
     final uid = _uid;
     if (uid == null) return;
-    await supabase
-        .from('user_settings')
-        .upsert({...settings.toSupabaseJson(), 'user_id': uid});
+    try {
+      await supabase
+          .from('user_settings')
+          .upsert({...settings.toSupabaseJson(), 'user_id': uid});
+    } catch (_) {
+      // Keep the local change; remote will reconcile on the next successful write.
+    }
   }
 
   /// The current settings, or the cached/default values while still loading.

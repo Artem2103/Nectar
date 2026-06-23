@@ -12,6 +12,7 @@ import '../../features/groups/presentation/groups_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/meals/presentation/add_meal_screen.dart';
 import '../../features/navigation/home_shell.dart';
+import '../../features/profile/presentation/goals_screen.dart';
 import '../../features/profile/presentation/profile_screen.dart';
 import '../../features/progress/presentation/progress_screen.dart';
 import 'app_routes.dart';
@@ -66,6 +67,12 @@ abstract final class AppRouter {
           path: AppRoutes.addMeal,
           name: AppRoutes.addMealName,
           builder: (context, state) => const AddMealScreen(),
+        ),
+        // Goals & targets editor, pushed above the shell from Profile.
+        GoRoute(
+          path: AppRoutes.goals,
+          name: AppRoutes.goalsName,
+          builder: (context, state) => const GoalsScreen(),
         ),
         // Auth flow — full-screen routes shown before the user has a session.
         GoRoute(
