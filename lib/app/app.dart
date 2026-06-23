@@ -11,27 +11,30 @@ import 'router/app_router.dart';
 /// Wires the Material 3 themes and the GoRouter together. The router is built
 /// once and held for the widget's lifetime so navigation state persists across
 /// rebuilds, while [themeControllerProvider] drives light/dark/system switching.
-class NectarApp extends ConsumerStatefulWidget {
+class NectarApp extends StatefulWidget {
   const NectarApp({super.key});
 
   @override
-  ConsumerState<NectarApp> createState() => _NectarAppState();
+  State<NectarApp> createState() => _NectarAppState();
 }
 
-class _NectarAppState extends ConsumerState<NectarApp> {
+class _NectarAppState extends State<NectarApp> {
   late final GoRouter _router = AppRouter.create();
 
   @override
   Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeControllerProvider);
-
-    return MaterialApp.router(
-      title: 'Nectar',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: themeMode,
-      routerConfig: _router,
+    return Consumer(
+      builder: (context, ref, _) {
+        final themeMode = ref.watch(themeControllerProvider);
+        return MaterialApp.router(
+          title: 'Nectar',
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.light,
+          darkTheme: AppTheme.dark,
+          themeMode: themeMode,
+          routerConfig: _router,
+        );
+      },
     );
   }
 }
