@@ -3,10 +3,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_title.dart';
@@ -47,7 +47,7 @@ class GoalsScreen extends ConsumerWidget {
                     IconButton(
                       onPressed: () => context.pop(),
                       icon: const Icon(Icons.arrow_back_rounded),
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
                     ),
@@ -95,6 +95,9 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
       TextEditingController(text: _fmt(widget.goals.proteinG));
   late final _carbs = TextEditingController(text: _fmt(widget.goals.carbsG));
   late final _fat = TextEditingController(text: _fmt(widget.goals.fatG));
+  late final _fiber = TextEditingController(text: _fmt(widget.goals.fiberG));
+  late final _sugar = TextEditingController(text: _fmt(widget.goals.sugarG));
+  late final _sodium = TextEditingController(text: _fmt(widget.goals.sodiumMg));
   late final _startWeight =
       TextEditingController(text: _fmt(_units.weightFromKg(widget.goals.startWeightKg)));
   late final _goalWeight =
@@ -118,6 +121,9 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
       _protein,
       _carbs,
       _fat,
+      _fiber,
+      _sugar,
+      _sodium,
       _startWeight,
       _goalWeight,
     ]) {
@@ -132,6 +138,9 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
       proteinG: double.tryParse(_protein.text),
       carbsG: double.tryParse(_carbs.text),
       fatG: double.tryParse(_fat.text),
+      fiberG: double.tryParse(_fiber.text),
+      sugarG: double.tryParse(_sugar.text),
+      sodiumMg: double.tryParse(_sodium.text),
       startWeightKg: _weightToKg(_startWeight.text),
       goalWeightKg: _weightToKg(_goalWeight.text),
     );
@@ -176,6 +185,19 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
               Expanded(child: _GoalField(controller: _fat, label: 'Fat g')),
             ],
           ),
+          const SizedBox(height: AppSpacing.md),
+          Row(
+            children: [
+              Expanded(
+                  child: _GoalField(controller: _fiber, label: 'Fiber g')),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                  child: _GoalField(controller: _sugar, label: 'Sugar g')),
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                  child: _GoalField(controller: _sodium, label: 'Sodium mg')),
+            ],
+          ),
           const SizedBox(height: AppSpacing.xl),
           Text('Weight journey', style: AppTypography.titleMedium),
           const SizedBox(height: AppSpacing.lg),
@@ -200,7 +222,7 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
             child: Text(
               _busy ? 'Saving…' : 'Save goals',
               style: AppTypography.titleMedium
-                  .copyWith(color: AppColors.onInverse, fontSize: 15),
+                  .copyWith(color: context.colors.onInverse, fontSize: 15),
             ),
           ),
         ],
@@ -236,14 +258,14 @@ class _GoalField extends StatelessWidget {
         labelText: label,
         labelStyle: AppTypography.label,
         filled: true,
-        fillColor: AppColors.surface,
-        border: const OutlineInputBorder(
+        fillColor: context.colors.surface,
+        border: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
       ),
     );

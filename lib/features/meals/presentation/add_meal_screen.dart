@@ -7,10 +7,10 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/pill_button.dart';
 import '../../../core/widgets/screen_title.dart';
@@ -35,6 +35,9 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   final _protein = TextEditingController();
   final _carbs = TextEditingController();
   final _fat = TextEditingController();
+  final _fiber = TextEditingController();
+  final _sugar = TextEditingController();
+  final _sodium = TextEditingController();
 
   File? _image;
   bool _analysing = false;
@@ -42,7 +45,16 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
 
   @override
   void dispose() {
-    for (final c in [_name, _kcal, _protein, _carbs, _fat]) {
+    for (final c in [
+      _name,
+      _kcal,
+      _protein,
+      _carbs,
+      _fat,
+      _fiber,
+      _sugar,
+      _sodium,
+    ]) {
       c.dispose();
     }
     super.dispose();
@@ -86,6 +98,9 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
       _protein.text = result.proteinG.toStringAsFixed(0);
       _carbs.text = result.carbsG.toStringAsFixed(0);
       _fat.text = result.fatG.toStringAsFixed(0);
+      _fiber.text = result.fiberG.toStringAsFixed(0);
+      _sugar.text = result.sugarG.toStringAsFixed(0);
+      _sodium.text = result.sodiumMg.toStringAsFixed(0);
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
@@ -117,6 +132,9 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
         proteinG: double.parse(_protein.text),
         carbsG: double.parse(_carbs.text),
         fatG: double.parse(_fat.text),
+        fiberG: double.tryParse(_fiber.text) ?? 0,
+        sugarG: double.tryParse(_sugar.text) ?? 0,
+        sodiumMg: double.tryParse(_sodium.text) ?? 0,
       );
       await repo.addMeal(entry);
       if (mounted) context.pop();
@@ -154,7 +172,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
                       IconButton(
                         onPressed: () => context.pop(),
                         icon: const Icon(Icons.arrow_back_rounded),
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                       ),
@@ -208,6 +226,37 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
                       ),
                     ],
                   ),
+                  const SizedBox(height: AppSpacing.lg),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _Field(
+                          controller: _fiber,
+                          label: 'Fiber g',
+                          number: true,
+                          optional: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _Field(
+                          controller: _sugar,
+                          label: 'Sugar g',
+                          number: true,
+                          optional: true,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.md),
+                      Expanded(
+                        child: _Field(
+                          controller: _sodium,
+                          label: 'Sodium mg',
+                          number: true,
+                          optional: true,
+                        ),
+                      ),
+                    ],
+                  ),
                   const SizedBox(height: AppSpacing.xl),
                   Row(
                     children: [
@@ -244,6 +293,7 @@ class _Field extends StatelessWidget {
     required this.label,
     this.number = false,
     this.integer = false,
+    this.optional = false,
     this.validator,
   });
 
@@ -251,6 +301,9 @@ class _Field extends StatelessWidget {
   final String label;
   final bool number;
   final bool integer;
+
+  /// When true a blank numeric field is accepted (treated as zero on save).
+  final bool optional;
   final String? Function(String?)? validator;
 
   @override
@@ -272,20 +325,22 @@ class _Field extends StatelessWidget {
         labelText: label,
         labelStyle: AppTypography.label,
         filled: true,
-        fillColor: AppColors.surface,
-        border: const OutlineInputBorder(
+        fillColor: context.colors.surface,
+        border: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
       ),
       validator: validator ??
           (number
               ? (v) {
-                  if (v == null || v.isEmpty) return 'Required';
+                  if (v == null || v.isEmpty) {
+                    return optional ? null : 'Required';
+                  }
                   final parsed =
                       integer ? int.tryParse(v) : double.tryParse(v);
                   return parsed == null ? 'Invalid' : null;

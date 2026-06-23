@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_assets.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/stat_ring.dart';
 
@@ -30,9 +30,9 @@ class StepsCard extends StatelessWidget {
             child: StatRing(
               size: 72,
               progress: goal == 0 ? 0 : (steps / goal).clamp(0.0, 1.0),
-              child: const Icon(
+              child: Icon(
                 Icons.directions_walk_rounded,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 size: 30,
               ),
             ),
@@ -73,9 +73,9 @@ class CaloriesBurnedCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           Row(
             children: [
-              const Icon(
+              Icon(
                 Icons.directions_walk_rounded,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 size: 20,
               ),
               const SizedBox(width: AppSpacing.sm),
@@ -85,7 +85,7 @@ class CaloriesBurnedCard extends StatelessWidget {
                   Text(
                     'Steps',
                     style: AppTypography.caption.copyWith(
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       fontWeight: AppTypography.semiBold,
                     ),
                   ),

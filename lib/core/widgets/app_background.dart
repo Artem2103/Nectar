@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
+import '../theme/nectar_colors.dart';
 
 /// The warm, top-weighted gradient that sits behind every screen.
 ///
@@ -14,16 +14,17 @@ class AppBackground extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.colors;
     return DecoratedBox(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          stops: [0.0, 0.32, 1.0],
+          stops: const [0.0, 0.32, 1.0],
           colors: [
-            AppColors.backgroundTop,
-            AppColors.background,
-            AppColors.surface,
+            colors.backgroundTop,
+            colors.background,
+            colors.backgroundBottom,
           ],
         ),
       ),

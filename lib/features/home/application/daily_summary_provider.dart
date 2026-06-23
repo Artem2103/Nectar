@@ -7,13 +7,6 @@ import '../../profile/application/goals_provider.dart';
 import '../../profile/domain/user_goals.dart';
 import '../domain/daily_summary.dart';
 
-/// Recommended daily targets for the secondary micronutrients. These aren't part
-/// of [UserGoals] yet, so reasonable fixed references stand in for the "left"
-/// figures on the carousel's second page.
-const double _fiberGoalG = 30;
-const double _sugarGoalG = 50;
-const double _sodiumGoalMg = 2300;
-
 /// Running totals consumed across a set of meals.
 typedef _Consumed = ({
   int kcal,
@@ -80,27 +73,33 @@ final dailySummaryProvider = Provider<AsyncValue<DailySummary>>((ref) {
           secondaryMacros: [
             MacroStat(
               label: 'Fiber left',
-              grams: (_fiberGoalG - consumed.fiberG)
+              grams: (goals.fiberG - consumed.fiberG)
                   .round()
-                  .clamp(0, _fiberGoalG.round()),
+                  .clamp(0, goals.fiberG.round()),
               asset: AppAssets.fiber,
-              progress: (consumed.fiberG / _fiberGoalG).clamp(0.0, 1.0),
+              progress: goals.fiberG == 0
+                  ? 0
+                  : (consumed.fiberG / goals.fiberG).clamp(0.0, 1.0),
             ),
             MacroStat(
               label: 'Sugar left',
-              grams: (_sugarGoalG - consumed.sugarG)
+              grams: (goals.sugarG - consumed.sugarG)
                   .round()
-                  .clamp(0, _sugarGoalG.round()),
+                  .clamp(0, goals.sugarG.round()),
               asset: AppAssets.sugar,
-              progress: (consumed.sugarG / _sugarGoalG).clamp(0.0, 1.0),
+              progress: goals.sugarG == 0
+                  ? 0
+                  : (consumed.sugarG / goals.sugarG).clamp(0.0, 1.0),
             ),
             MacroStat(
               label: 'Sodium left',
-              grams: (_sodiumGoalMg - consumed.sodiumMg)
+              grams: (goals.sodiumMg - consumed.sodiumMg)
                   .round()
-                  .clamp(0, _sodiumGoalMg.round()),
+                  .clamp(0, goals.sodiumMg.round()),
               asset: AppAssets.sodium,
-              progress: (consumed.sodiumMg / _sodiumGoalMg).clamp(0.0, 1.0),
+              progress: goals.sodiumMg == 0
+                  ? 0
+                  : (consumed.sodiumMg / goals.sodiumMg).clamp(0.0, 1.0),
             ),
           ],
           healthScore: _computeHealthScore(consumed, goals),

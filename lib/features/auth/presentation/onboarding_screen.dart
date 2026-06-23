@@ -5,9 +5,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../app/router/app_routes.dart';
 import '../../../core/supabase/supabase_client.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../profile/application/goals_provider.dart';
@@ -114,7 +114,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
                       child: Text(
                         _busy ? 'Saving…' : 'Get started',
                         style: AppTypography.titleMedium
-                            .copyWith(color: AppColors.onInverse, fontSize: 15),
+                            .copyWith(color: context.colors.onInverse, fontSize: 15),
                       ),
                     ),
                   ],

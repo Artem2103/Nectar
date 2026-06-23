@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/meal_entry.dart';
 
@@ -85,16 +86,16 @@ class _Thumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final image = _image();
+    final image = _image(context);
     if (image != null) {
       return ClipRRect(borderRadius: AppRadii.mdAll, child: image);
     }
-    return _placeholder();
+    return _placeholder(context);
   }
 
   /// Resolves [imagePath] to a sized image widget: a network image for uploaded
   /// photos, a local file for not-yet-synced ones, or `null` when there's none.
-  Widget? _image() {
+  Widget? _image(BuildContext context) {
     final path = imagePath;
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) {
@@ -104,7 +105,7 @@ class _Thumbnail extends StatelessWidget {
         height: _size,
         fit: BoxFit.cover,
         excludeFromSemantics: true,
-        errorBuilder: (context, error, stack) => _placeholder(),
+        errorBuilder: (context, error, stack) => _placeholder(context),
       );
     }
     if (File(path).existsSync()) {
@@ -119,12 +120,12 @@ class _Thumbnail extends StatelessWidget {
     return null;
   }
 
-  Widget _placeholder() {
+  Widget _placeholder(BuildContext context) {
     return Container(
       width: _size,
       height: _size,
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceMuted,
+      decoration: BoxDecoration(
+        color: context.colors.surfaceMuted,
         borderRadius: AppRadii.mdAll,
       ),
       child: const Icon(

@@ -21,9 +21,12 @@ abstract final class AppTypography {
   static const FontWeight bold = FontWeight.w700;
   static const FontWeight extraBold = FontWeight.w800;
 
+  // No colour is baked into [_base]: primary text inherits the themed default
+  // (light or dark) via the [TextTheme], so the named styles below adapt to the
+  // active brightness. The secondary mid-grey on [label]/[caption] reads well on
+  // both, so those keep an explicit colour.
   static const TextStyle _base = TextStyle(
     fontFamily: fontFamily,
-    color: AppColors.textPrimary,
     letterSpacing: -0.2,
     height: 1.2,
   );

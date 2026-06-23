@@ -7,6 +7,7 @@ import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/progress_summary.dart';
 
@@ -61,7 +62,11 @@ class _WeightChartCardState extends State<WeightChartCard> {
           SizedBox(
             height: _chartHeight,
             child: CustomPaint(
-              painter: _WeightChartPainter(values: widget.trend),
+              painter: _WeightChartPainter(
+                values: widget.trend,
+                gridColor: context.colors.border,
+                lineColor: context.colors.chartLine,
+              ),
               size: Size.infinite,
             ),
           ),
@@ -89,8 +94,8 @@ class _GoalFlag extends StatelessWidget {
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceMuted,
+      decoration: BoxDecoration(
+        color: context.colors.surfaceMuted,
         borderRadius: AppRadii.pillAll,
       ),
       child: Row(
@@ -110,7 +115,7 @@ class _GoalFlag extends StatelessWidget {
                 TextSpan(
                   text: '$percent% ',
                   style: AppTypography.caption.copyWith(
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     fontWeight: AppTypography.bold,
                   ),
                 ),
@@ -135,8 +140,8 @@ class _RangeSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.xs),
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceMuted,
+      decoration: BoxDecoration(
+        color: context.colors.surfaceMuted,
         borderRadius: AppRadii.pillAll,
       ),
       child: Row(
@@ -176,7 +181,7 @@ class _Segment extends StatelessWidget {
         curve: Curves.easeOut,
         padding: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
         decoration: BoxDecoration(
-          color: selected ? AppColors.surface : Colors.transparent,
+          color: selected ? context.colors.surface : Colors.transparent,
           borderRadius: AppRadii.pillAll,
           boxShadow: selected ? AppShadows.raised : const [],
         ),
@@ -184,7 +189,9 @@ class _Segment extends StatelessWidget {
           label,
           textAlign: TextAlign.center,
           style: AppTypography.caption.copyWith(
-            color: selected ? AppColors.textPrimary : AppColors.textSecondary,
+            color: selected
+                ? context.colors.textPrimary
+                : AppColors.textSecondary,
             fontWeight:
                 selected ? AppTypography.semiBold : AppTypography.medium,
           ),
@@ -199,9 +206,15 @@ class _Segment extends StatelessWidget {
 /// spaced rows down the right-hand gutter, so it reads correctly whatever the
 /// weights or unit happen to be.
 class _WeightChartPainter extends CustomPainter {
-  const _WeightChartPainter({required this.values});
+  const _WeightChartPainter({
+    required this.values,
+    required this.gridColor,
+    required this.lineColor,
+  });
 
   final List<double> values;
+  final Color gridColor;
+  final Color lineColor;
 
   static const int _gridRows = 4; // labelled horizontal lines.
   static const double _gutter = 40; // right-hand space for the scale labels.
@@ -229,7 +242,7 @@ class _WeightChartPainter extends CustomPainter {
         _vInset + usableHeight * (1 - (value - lo) / (hi - lo));
 
     final gridPaint = Paint()
-      ..color = AppColors.border
+      ..color = gridColor
       ..strokeWidth = 1;
 
     for (var row = 0; row < _gridRows; row++) {
@@ -250,7 +263,7 @@ class _WeightChartPainter extends CustomPainter {
     if (values.isEmpty) return;
 
     final linePaint = Paint()
-      ..color = AppColors.chartLine
+      ..color = lineColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round
@@ -269,5 +282,7 @@ class _WeightChartPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_WeightChartPainter old) =>
-      !listEquals(old.values, values);
+      !listEquals(old.values, values) ||
+      old.gridColor != gridColor ||
+      old.lineColor != lineColor;
 }

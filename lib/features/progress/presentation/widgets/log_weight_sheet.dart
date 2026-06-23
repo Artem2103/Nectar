@@ -4,10 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../../core/supabase/supabase_client.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../profile/application/settings_provider.dart';
 import '../../../profile/domain/app_settings.dart';
 import '../../application/weight_provider.dart';
@@ -90,9 +90,11 @@ class _LogWeightSheetState extends State<_LogWeightSheet> {
     return Padding(
       padding: EdgeInsets.only(bottom: bottomInset),
       child: Container(
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadii.xl)),
+        decoration: BoxDecoration(
+          color: context.colors.surface,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppRadii.xl),
+          ),
         ),
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
@@ -115,14 +117,14 @@ class _LogWeightSheetState extends State<_LogWeightSheet> {
                 labelStyle: AppTypography.label,
                 errorText: _error,
                 filled: true,
-                fillColor: AppColors.surface,
-                border: const OutlineInputBorder(
+                fillColor: context.colors.surface,
+                border: OutlineInputBorder(
                   borderRadius: AppRadii.lgAll,
-                  borderSide: BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.colors.border),
                 ),
-                enabledBorder: const OutlineInputBorder(
+                enabledBorder: OutlineInputBorder(
                   borderRadius: AppRadii.lgAll,
-                  borderSide: BorderSide(color: AppColors.border),
+                  borderSide: BorderSide(color: context.colors.border),
                 ),
               ),
             ),
@@ -132,7 +134,7 @@ class _LogWeightSheetState extends State<_LogWeightSheet> {
               child: Text(
                 _busy ? 'Saving…' : 'Save',
                 style: AppTypography.titleMedium
-                    .copyWith(color: AppColors.onInverse, fontSize: 15),
+                    .copyWith(color: context.colors.onInverse, fontSize: 15),
               ),
             ),
           ],

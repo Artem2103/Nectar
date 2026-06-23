@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_assets.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/badge_definition.dart';
 
@@ -46,7 +46,7 @@ Future<void> _showBadgesDialog(BuildContext context, Set<String> earnedIds) {
   return showDialog<void>(
     context: context,
     builder: (context) => Dialog(
-      backgroundColor: AppColors.surface,
+      backgroundColor: context.colors.surface,
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(

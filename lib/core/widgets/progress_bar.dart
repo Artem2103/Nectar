@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/nectar_colors.dart';
 
 /// A rounded linear progress indicator: a neutral [trackColor] rail overlaid
 /// with a [color] fill spanning [fraction] (0–1) of its width.
@@ -12,7 +13,7 @@ class ProgressBar extends StatelessWidget {
     required this.fraction,
     this.height = 10,
     this.color = AppColors.accent,
-    this.trackColor = AppColors.track,
+    this.trackColor,
     super.key,
   });
 
@@ -21,7 +22,9 @@ class ProgressBar extends StatelessWidget {
 
   final double height;
   final Color color;
-  final Color trackColor;
+
+  /// Rail colour; resolves to the theme-aware [NectarColors.track] when null.
+  final Color? trackColor;
 
   @override
   Widget build(BuildContext context) {
@@ -29,7 +32,7 @@ class ProgressBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(height),
       child: Stack(
         children: [
-          Container(height: height, color: trackColor),
+          Container(height: height, color: trackColor ?? context.colors.track),
           FractionallySizedBox(
             widthFactor: fraction.clamp(0.0, 1.0),
             child: Container(height: height, color: color),

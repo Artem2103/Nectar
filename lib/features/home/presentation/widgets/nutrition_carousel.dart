@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../domain/daily_summary.dart';
 import 'activity_cards.dart';
 import 'nutrition_cards.dart';
@@ -163,7 +163,9 @@ class _DotsIndicator extends StatelessWidget {
             width: i == activeIndex ? 8 : 6,
             height: i == activeIndex ? 8 : 6,
             decoration: BoxDecoration(
-              color: i == activeIndex ? AppColors.textPrimary : AppColors.track,
+              color: i == activeIndex
+                  ? context.colors.textPrimary
+                  : context.colors.track,
               borderRadius: AppRadii.pillAll,
             ),
           ),

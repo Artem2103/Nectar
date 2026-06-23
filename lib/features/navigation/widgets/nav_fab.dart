@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_shadows.dart';
+import '../../../core/theme/nectar_colors.dart';
 
 /// The black circular "+" action that floats beside the navigation bar.
 ///
@@ -17,8 +17,8 @@ class NavFab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surfaceInverse,
+      decoration: BoxDecoration(
+        color: context.colors.surfaceInverse,
         shape: BoxShape.circle,
         boxShadow: AppShadows.floating,
       ),
@@ -31,9 +31,9 @@ class NavFab extends StatelessWidget {
           child: SizedBox(
             width: size,
             height: size,
-            child: const Icon(
+            child: Icon(
               Icons.add_rounded,
-              color: AppColors.onInverse,
+              color: context.colors.onInverse,
               size: 30,
               semanticLabel: 'Add meal',
             ),

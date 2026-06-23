@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/pill_button.dart';
 import '../../../../core/widgets/progress_bar.dart';
@@ -95,7 +95,7 @@ class _Anchor extends StatelessWidget {
           TextSpan(
             text: value,
             style: AppTypography.titleMedium.copyWith(
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               fontSize: 15,
             ),
           ),

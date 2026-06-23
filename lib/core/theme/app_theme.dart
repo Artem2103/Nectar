@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 import 'app_radii.dart';
 import 'app_typography.dart';
+import 'nectar_colors.dart';
 
 /// Assembles the design tokens into a single Material 3 [ThemeData].
 ///
@@ -26,11 +27,15 @@ abstract final class AppTheme {
       error: Color(0xFFE5484D),
     );
 
-    final textTheme = _buildTextTheme();
+    final textTheme = _buildTextTheme().apply(
+      bodyColor: AppColors.textPrimary,
+      displayColor: AppColors.textPrimary,
+    );
 
     return ThemeData(
       useMaterial3: true,
       colorScheme: colorScheme,
+      extensions: const [NectarColors.light],
       scaffoldBackgroundColor: AppColors.background,
       fontFamily: AppTypography.fontFamily,
       textTheme: textTheme,
@@ -96,6 +101,7 @@ abstract final class AppTheme {
       useMaterial3: true,
       brightness: Brightness.dark,
       colorScheme: colorScheme,
+      extensions: const [NectarColors.dark],
       scaffoldBackgroundColor: AppColors.backgroundDark,
       fontFamily: AppTypography.fontFamily,
       textTheme: textTheme,

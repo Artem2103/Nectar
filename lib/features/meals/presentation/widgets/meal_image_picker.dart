@@ -6,6 +6,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 
 /// Tappable square that shows the chosen meal photo, or a prompt to pick one.
 class MealImagePicker extends StatelessWidget {
@@ -28,8 +29,8 @@ class MealImagePicker extends StatelessWidget {
           child: picked != null
               ? Image.file(picked, fit: BoxFit.cover, excludeFromSemantics: true)
               : DecoratedBox(
-                  decoration: const BoxDecoration(
-                    color: AppColors.surfaceMuted,
+                  decoration: BoxDecoration(
+                    color: context.colors.surfaceMuted,
                     borderRadius: AppRadii.xlAll,
                   ),
                   child: Column(

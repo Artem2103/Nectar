@@ -3,9 +3,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/router/app_routes.dart';
 import '../../../core/supabase/supabase_client.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/app_card.dart';
 import 'widgets/auth_text_field.dart';
@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Text(
                         _busy ? 'Signing in…' : 'Sign in',
                         style: AppTypography.titleMedium
-                            .copyWith(color: AppColors.onInverse, fontSize: 15),
+                            .copyWith(color: context.colors.onInverse, fontSize: 15),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),

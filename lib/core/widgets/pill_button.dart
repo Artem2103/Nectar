@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_typography.dart';
+import '../theme/nectar_colors.dart';
 
 /// A fully-rounded, inky action button — the "Log weight →" control.
 ///
@@ -25,18 +25,19 @@ class PillButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final onInverse = context.colors.onInverse;
     return FilledButton(
       onPressed: onPressed,
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(label, style: AppTypography.titleMedium.copyWith(
-            color: AppColors.onInverse,
+            color: onInverse,
             fontSize: 15,
           )),
           if (icon != null) ...[
             const SizedBox(width: AppSpacing.sm),
-            Icon(icon, size: 18, color: AppColors.onInverse),
+            Icon(icon, size: 18, color: onInverse),
           ],
         ],
       ),

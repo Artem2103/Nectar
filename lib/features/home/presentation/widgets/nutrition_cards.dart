@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/stat_ring.dart';
 import '../../domain/daily_summary.dart';
@@ -30,11 +31,11 @@ class CaloriesCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppSpacing.lg),
-          const StatRing(
+          StatRing(
             size: 76,
             child: Icon(
               Icons.local_fire_department_rounded,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               size: 30,
             ),
           ),
@@ -144,7 +145,7 @@ class _ScoreBar extends StatelessWidget {
       borderRadius: BorderRadius.circular(_height),
       child: Stack(
         children: [
-          Container(height: _height, color: AppColors.track),
+          Container(height: _height, color: context.colors.track),
           FractionallySizedBox(
             widthFactor: fraction.clamp(0.0, 1.0),
             child: Container(height: _height, color: AppColors.accent),

@@ -4,6 +4,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 
 /// A titled group of settings rows rendered inside a single rounded card.
@@ -189,11 +190,11 @@ class _SettingsRowShell extends StatelessWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
-                color: AppColors.surfaceMuted,
+              decoration: BoxDecoration(
+                color: context.colors.surfaceMuted,
                 borderRadius: AppRadii.mdAll,
               ),
-              child: Icon(icon, size: 20, color: AppColors.textPrimary),
+              child: Icon(icon, size: 20, color: context.colors.textPrimary),
             ),
             const SizedBox(width: AppSpacing.md),
           ],

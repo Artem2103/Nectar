@@ -58,9 +58,11 @@ abstract final class AppColors {
   static const Color chartLine = Color(0xFF3A3A3C);
 
   // ── Dark scheme ──────────────────────────────────────────────────────────
-  // Baseline dark tokens consumed by [AppTheme.dark] and the themeMode wiring.
-  // Bespoke widgets still reference the light tokens above directly, so the
-  // full dark repaint is tracked as the "Dark mode" polish item.
+  // Dark tokens consumed by [AppTheme.dark] and resolved through [NectarColors]
+  // so bespoke, token-driven widgets repaint correctly in dark mode.
+  /// Warm-equivalent top of the dark background gradient.
+  static const Color backgroundTopDark = Color(0xFF17171C);
+
   /// Dark base background.
   static const Color backgroundDark = Color(0xFF0E0E11);
 
@@ -81,6 +83,12 @@ abstract final class AppColors {
 
   /// Hairline borders and neutral tracks on dark surfaces.
   static const Color borderDark = Color(0xFF2C2C33);
+
+  /// Neutral track behind progress rings and bars on dark surfaces.
+  static const Color trackDark = Color(0xFF33333B);
+
+  /// Light data line used by charts on dark surfaces.
+  static const Color chartLineDark = Color(0xFFD4D4D8);
 
   // ── Decorative ───────────────────────────────────────────────────────────
   /// Soft gradient pair behind the maintenance illustration.

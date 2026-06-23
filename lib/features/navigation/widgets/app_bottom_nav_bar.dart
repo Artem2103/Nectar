@@ -5,6 +5,7 @@ import '../../../core/theme/app_radii.dart';
 import '../../../core/theme/app_shadows.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 
 /// A single destination in the floating navigation bar.
 class NavDestination {
@@ -41,8 +42,8 @@ class AppBottomNavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       height: 72,
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
+      decoration: BoxDecoration(
+        color: context.colors.surface,
         borderRadius: AppRadii.xxlAll,
         boxShadow: AppShadows.floating,
       ),
@@ -76,7 +77,8 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? AppColors.textPrimary : AppColors.textSecondary;
+    final color =
+        selected ? context.colors.textPrimary : AppColors.textSecondary;
 
     return Semantics(
       button: true,
@@ -91,7 +93,8 @@ class _NavItem extends StatelessWidget {
           margin: const EdgeInsets.symmetric(vertical: AppSpacing.sm),
           padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
           decoration: BoxDecoration(
-            color: selected ? AppColors.surfaceMuted : Colors.transparent,
+            color:
+                selected ? context.colors.surfaceMuted : Colors.transparent,
             borderRadius: AppRadii.lgAll,
           ),
           child: Column(

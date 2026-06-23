@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/constants/app_assets.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 
 /// Home top bar: the Nectar wordmark on the left and the day-streak pill on the
 /// right, as shown across every Home page in `Nectar.pdf`.
@@ -70,8 +70,8 @@ class _StreakPill extends StatelessWidget {
           horizontal: AppSpacing.md,
           vertical: AppSpacing.sm,
         ),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
+        decoration: BoxDecoration(
+          color: context.colors.surface,
           borderRadius: AppRadii.pillAll,
           boxShadow: AppShadows.card,
         ),

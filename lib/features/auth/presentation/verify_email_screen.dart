@@ -6,9 +6,9 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../app/router/app_routes.dart';
 import '../../../core/supabase/supabase_client.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/app_card.dart';
 
@@ -100,7 +100,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                       child: Text(
                         _resending ? 'Sending…' : 'Resend email',
                         style: AppTypography.titleMedium
-                            .copyWith(color: AppColors.onInverse, fontSize: 15),
+                            .copyWith(color: context.colors.onInverse, fontSize: 15),
                       ),
                     ),
                     const SizedBox(height: AppSpacing.sm),

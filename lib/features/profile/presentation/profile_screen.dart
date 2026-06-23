@@ -10,6 +10,7 @@ import '../../../core/supabase/supabase_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
+import '../../../core/theme/nectar_colors.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_title.dart';
 import '../../auth/application/auth_provider.dart';
@@ -355,11 +356,11 @@ class _Header extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 26,
-            backgroundColor: AppColors.surfaceInverse,
+            backgroundColor: context.colors.surfaceInverse,
             child: Text(
               initial,
               style: AppTypography.statNumber
-                  .copyWith(color: AppColors.onInverse),
+                  .copyWith(color: context.colors.onInverse),
             ),
           ),
           const SizedBox(width: AppSpacing.lg),

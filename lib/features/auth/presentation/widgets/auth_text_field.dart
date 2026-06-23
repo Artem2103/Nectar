@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 
 /// A labelled text field matching the app's form styling, shared across the
 /// login, register and onboarding screens.
@@ -31,14 +31,14 @@ class AuthTextField extends StatelessWidget {
         labelText: label,
         labelStyle: AppTypography.label,
         filled: true,
-        fillColor: AppColors.surface,
-        border: const OutlineInputBorder(
+        fillColor: context.colors.surface,
+        border: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
-        enabledBorder: const OutlineInputBorder(
+        enabledBorder: OutlineInputBorder(
           borderRadius: AppRadii.lgAll,
-          borderSide: BorderSide(color: AppColors.border),
+          borderSide: BorderSide(color: context.colors.border),
         ),
       ),
     );

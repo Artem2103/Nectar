@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../theme/app_colors.dart';
+import '../theme/nectar_colors.dart';
 
 /// A circular progress ring with content centred inside it.
 ///
@@ -17,7 +18,7 @@ class StatRing extends StatelessWidget {
     required this.child,
     this.progress = 0,
     this.strokeWidth = 6,
-    this.trackColor = AppColors.track,
+    this.trackColor,
     this.progressColor = AppColors.accent,
     super.key,
   }) : assert(progress >= 0 && progress <= 1, 'progress must be 0..1');
@@ -29,7 +30,9 @@ class StatRing extends StatelessWidget {
   final double progress;
 
   final double strokeWidth;
-  final Color trackColor;
+
+  /// Ring track colour; resolves to the theme-aware [NectarColors.track] when null.
+  final Color? trackColor;
   final Color progressColor;
 
   /// Centred content (icon, emoji or image).
@@ -43,7 +46,7 @@ class StatRing extends StatelessWidget {
         painter: _RingPainter(
           progress: progress,
           strokeWidth: strokeWidth,
-          trackColor: trackColor,
+          trackColor: trackColor ?? context.colors.track,
           progressColor: progressColor,
         ),
         child: Center(child: child),

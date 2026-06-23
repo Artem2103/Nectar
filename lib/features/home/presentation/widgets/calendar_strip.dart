@@ -7,6 +7,7 @@ import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../domain/daily_summary.dart';
 
 /// The weekly day selector beneath the Home header (`Nectar.pdf`).
@@ -48,7 +49,9 @@ class _DayCell extends StatelessWidget {
         Text(
           day.label,
           style: AppTypography.caption.copyWith(
-            color: selected ? AppColors.textPrimary : AppColors.textSecondary,
+            color: selected
+                ? context.colors.textPrimary
+                : AppColors.textSecondary,
             fontWeight:
                 selected ? AppTypography.semiBold : AppTypography.medium,
           ),
@@ -74,8 +77,8 @@ class _DayCell extends StatelessWidget {
           horizontal: AppSpacing.xs,
           vertical: AppSpacing.sm,
         ),
-        decoration: const BoxDecoration(
-          color: AppColors.surface,
+        decoration: BoxDecoration(
+          color: context.colors.surface,
           borderRadius: AppRadii.lgAll,
           boxShadow: AppShadows.raised,
         ),
@@ -96,12 +99,15 @@ class _DayNumber extends StatelessWidget {
     return SizedBox.square(
       dimension: _DayCell._ringSize,
       child: CustomPaint(
-        painter: _DayRingPainter(dotted: !selected),
+        painter: _DayRingPainter(
+          dotted: !selected,
+          ringColor: context.colors.border,
+        ),
         child: Center(
           child: Text(
             '$number',
             style: AppTypography.caption.copyWith(
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               fontWeight: AppTypography.semiBold,
               letterSpacing: 0,
             ),
@@ -115,9 +121,10 @@ class _DayNumber extends StatelessWidget {
 /// Draws the ring around a day number: a ring of small dots for unselected days,
 /// or a solid hairline circle for the selected day.
 class _DayRingPainter extends CustomPainter {
-  const _DayRingPainter({required this.dotted});
+  const _DayRingPainter({required this.dotted, required this.ringColor});
 
   final bool dotted;
+  final Color ringColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -128,7 +135,7 @@ class _DayRingPainter extends CustomPainter {
       final solid = Paint()
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5
-        ..color = AppColors.border;
+        ..color = ringColor;
       canvas.drawCircle(center, radius, solid);
       return;
     }
@@ -136,7 +143,7 @@ class _DayRingPainter extends CustomPainter {
     const dotCount = 26;
     final dot = Paint()
       ..style = PaintingStyle.fill
-      ..color = AppColors.border;
+      ..color = ringColor;
     for (var i = 0; i < dotCount; i++) {
       final angle = (2 * math.pi / dotCount) * i;
       final offset = Offset(
@@ -148,5 +155,6 @@ class _DayRingPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_DayRingPainter old) => old.dotted != dotted;
+  bool shouldRepaint(_DayRingPainter old) =>
+      old.dotted != dotted || old.ringColor != ringColor;
 }

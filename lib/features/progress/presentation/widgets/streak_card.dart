@@ -4,6 +4,7 @@ import '../../../../core/constants/app_assets.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../../core/theme/nectar_colors.dart';
 import '../../../../core/widgets/app_card.dart';
 import '../../domain/progress_summary.dart';
 
@@ -65,7 +66,7 @@ class _StreakDot extends StatelessWidget {
           height: _size,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: day.completed ? AppColors.streak : AppColors.track,
+            color: day.completed ? AppColors.streak : context.colors.track,
           ),
           child: day.completed
               ? const Icon(

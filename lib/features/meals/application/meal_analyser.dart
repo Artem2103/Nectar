@@ -13,6 +13,9 @@ class MealAnalysis {
     required this.proteinG,
     required this.carbsG,
     required this.fatG,
+    this.fiberG = 0,
+    this.sugarG = 0,
+    this.sodiumMg = 0,
   });
 
   final String name;
@@ -20,6 +23,9 @@ class MealAnalysis {
   final double proteinG;
   final double carbsG;
   final double fatG;
+  final double fiberG;
+  final double sugarG;
+  final double sodiumMg;
 
   factory MealAnalysis.fromJson(Map<String, dynamic> json) => MealAnalysis(
         name: json['name'] as String,
@@ -27,6 +33,9 @@ class MealAnalysis {
         proteinG: (json['proteinG'] as num).toDouble(),
         carbsG: (json['carbsG'] as num).toDouble(),
         fatG: (json['fatG'] as num).toDouble(),
+        fiberG: (json['fiberG'] as num?)?.toDouble() ?? 0,
+        sugarG: (json['sugarG'] as num?)?.toDouble() ?? 0,
+        sodiumMg: (json['sodiumMg'] as num?)?.toDouble() ?? 0,
       );
 }
 
@@ -73,8 +82,10 @@ Future<MealAnalysis> analyseImage(File imageFile) async {
               'type': 'text',
               'text':
                   'Identify the meal in this image. Reply ONLY with valid JSON: '
-                      '{"name":"...","kcal":...,"proteinG":...,"carbsG":...,"fatG":...}. '
-                      'Use typical serving-size estimates.',
+                      '{"name":"...","kcal":...,"proteinG":...,"carbsG":...,"fatG":...,'
+                      '"fiberG":...,"sugarG":...,"sodiumMg":...}. '
+                      'proteinG, carbsG, fatG, fiberG and sugarG are grams; '
+                      'sodiumMg is milligrams. Use typical serving-size estimates.',
             },
           ],
         },
