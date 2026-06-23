@@ -98,8 +98,8 @@
 
 ## Bugs / Known issues (reported 2026-06-23)
 
-- [ ] Home: second carousel (NutritionCarousel) has a RenderFlex "overflow by 15 pixels" yellow/black stripe — fix the card/row height or content sizing
-- [ ] Home: carousel cards on adjacent pages touch when scrolling — need symmetric horizontal spacing/gutter between pages (viewportFraction + padding/peek)
+- [x] Home: second carousel (NutritionCarousel) has a RenderFlex "overflow by 15 pixels" yellow/black stripe — fix the card/row height or content sizing
+- [x] Home: carousel cards on adjacent pages touch when scrolling — need symmetric horizontal spacing/gutter between pages (viewportFraction + padding/peek)
 - [ ] AI: Claude vision API not actually connected for "Analyse photo" — wire up the real API key/request (deferred)
 
 ---

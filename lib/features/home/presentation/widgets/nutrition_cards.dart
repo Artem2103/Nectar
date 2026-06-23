@@ -116,9 +116,14 @@ class HealthScoreCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.lg),
           _ScoreBar(fraction: max == 0 ? 0 : score / max),
           const SizedBox(height: AppSpacing.lg),
-          Text(note, style: AppTypography.body.copyWith(
-            color: AppColors.textSecondary,
-          )),
+          Text(
+            note,
+            maxLines: 3,
+            overflow: TextOverflow.ellipsis,
+            style: AppTypography.body.copyWith(
+              color: AppColors.textSecondary,
+            ),
+          ),
         ],
       ),
     );

@@ -29,7 +29,12 @@ class _NutritionCarouselState extends State<NutritionCarousel> {
 
   /// Tall enough for the largest page; shorter pages top-align, leaving room for
   /// the card shadows so the viewport never clips them.
-  static const double _pageHeight = 320;
+  static const double _pageHeight = 344;
+
+  /// Half the gutter shown between adjacent pages while swiping. Applied
+  /// symmetrically to every page so both neighbouring cards look identically
+  /// inset and never touch.
+  static const double _pageGutter = AppSpacing.sm;
 
   @override
   void dispose() {
@@ -93,7 +98,9 @@ class _NutritionCarouselState extends State<NutritionCarousel> {
   }
 }
 
-/// A single carousel page: top-aligned content so card shadows are not clipped.
+/// A single carousel page: top-aligned content so card shadows are not clipped,
+/// inset by [_NutritionCarouselState._pageGutter] on each side so neighbouring
+/// pages keep a symmetric gutter and never touch while swiping.
 class _Page extends StatelessWidget {
   const _Page({required this.children});
 
@@ -101,11 +108,16 @@ class _Page extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Align(
-      alignment: Alignment.topCenter,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: _NutritionCarouselState._pageGutter,
+      ),
+      child: Align(
+        alignment: Alignment.topCenter,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: children,
+        ),
       ),
     );
   }
