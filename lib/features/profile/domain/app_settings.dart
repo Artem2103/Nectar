@@ -11,6 +11,20 @@ enum UnitSystem {
   /// Round-trips through the persisted [name]; falls back to [metric].
   static UnitSystem fromName(String? name) =>
       UnitSystem.values.firstWhere((u) => u.name == name, orElse: () => metric);
+
+  /// Kilograms in one pound — the single source of truth for weight conversion.
+  static const double _lbPerKg = 2.2046226218;
+
+  /// Short suffix shown after a weight figure in this system (`kg` / `lb`).
+  String get weightLabel => this == imperial ? 'lb' : 'kg';
+
+  /// Converts a canonical kilogram value into this system's display unit.
+  /// Weights are always stored in kilograms; this is display-only.
+  double weightFromKg(double kg) => this == imperial ? kg * _lbPerKg : kg;
+
+  /// Converts a value the user entered in this system's display unit back to the
+  /// canonical kilograms used for storage.
+  double weightToKg(double value) => this == imperial ? value / _lbPerKg : value;
 }
 
 /// The user's app-wide preferences (appearance, units, notifications).

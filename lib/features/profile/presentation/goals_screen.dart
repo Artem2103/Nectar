@@ -11,6 +11,8 @@ import '../../../core/widgets/app_background.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_title.dart';
 import '../application/goals_provider.dart';
+import '../application/settings_provider.dart';
+import '../domain/app_settings.dart';
 import '../domain/user_goals.dart';
 
 /// Full-screen "Goals & targets" editor, pushed from the Profile hub.
@@ -25,7 +27,9 @@ class GoalsScreen extends ConsumerWidget {
     final goalsAsync = ref.watch(goalsProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // An opaque scaffold colour (rather than transparent) keeps the strip the
+      // keyboard vacates from flashing the black OS window as it animates away;
+      // AppBackground still paints the gradient over the body.
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
@@ -82,6 +86,9 @@ class _GoalsForm extends ConsumerStatefulWidget {
 }
 
 class _GoalsFormState extends ConsumerState<_GoalsForm> {
+  // Read once: the form edits a snapshot, so the unit is fixed for its lifetime.
+  late final UnitSystem _units =
+      ref.read(settingsProvider).value?.units ?? UnitSystem.metric;
   late final _dailyKcal =
       TextEditingController(text: widget.goals.dailyKcal.toString());
   late final _protein =
@@ -89,13 +96,20 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
   late final _carbs = TextEditingController(text: _fmt(widget.goals.carbsG));
   late final _fat = TextEditingController(text: _fmt(widget.goals.fatG));
   late final _startWeight =
-      TextEditingController(text: _fmt(widget.goals.startWeightKg));
+      TextEditingController(text: _fmt(_units.weightFromKg(widget.goals.startWeightKg)));
   late final _goalWeight =
-      TextEditingController(text: _fmt(widget.goals.goalWeightKg));
+      TextEditingController(text: _fmt(_units.weightFromKg(widget.goals.goalWeightKg)));
   bool _busy = false;
 
   static String _fmt(double v) =>
-      v == v.truncateToDouble() ? v.toStringAsFixed(0) : v.toString();
+      v == v.truncateToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+
+  /// Parses a weight field (in the display unit) back to kilograms for storage,
+  /// or `null` when the field is blank/invalid so the existing value is kept.
+  double? _weightToKg(String text) {
+    final parsed = double.tryParse(text);
+    return parsed == null ? null : _units.weightToKg(parsed);
+  }
 
   @override
   void dispose() {
@@ -118,8 +132,8 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
       proteinG: double.tryParse(_protein.text),
       carbsG: double.tryParse(_carbs.text),
       fatG: double.tryParse(_fat.text),
-      startWeightKg: double.tryParse(_startWeight.text),
-      goalWeightKg: double.tryParse(_goalWeight.text),
+      startWeightKg: _weightToKg(_startWeight.text),
+      goalWeightKg: _weightToKg(_goalWeight.text),
     );
     setState(() => _busy = true);
     try {
@@ -169,12 +183,14 @@ class _GoalsFormState extends ConsumerState<_GoalsForm> {
             children: [
               Expanded(
                 child: _GoalField(
-                    controller: _startWeight, label: 'Start weight kg'),
+                    controller: _startWeight,
+                    label: 'Start weight ${_units.weightLabel}'),
               ),
               const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: _GoalField(
-                    controller: _goalWeight, label: 'Goal weight kg'),
+                    controller: _goalWeight,
+                    label: 'Goal weight ${_units.weightLabel}'),
               ),
             ],
           ),

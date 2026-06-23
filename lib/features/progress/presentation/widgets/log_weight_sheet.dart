@@ -8,11 +8,13 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radii.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/app_typography.dart';
+import '../../../profile/application/settings_provider.dart';
+import '../../../profile/domain/app_settings.dart';
 import '../../application/weight_provider.dart';
 import '../../domain/weight_entry.dart';
 
 /// Opens the bottom sheet for recording a new weigh-in, pre-filled with the
-/// user's current weight.
+/// user's current weight (already in the active display unit).
 Future<void> showLogWeightSheet(
   BuildContext context,
   WidgetRef ref, {
@@ -37,6 +39,8 @@ class _LogWeightSheet extends StatefulWidget {
 }
 
 class _LogWeightSheetState extends State<_LogWeightSheet> {
+  late final UnitSystem _units =
+      widget.ref.read(settingsProvider).value?.units ?? UnitSystem.metric;
   late final TextEditingController _value =
       TextEditingController(text: widget.currentWeight.toStringAsFixed(1));
   String? _error;
@@ -63,7 +67,8 @@ class _LogWeightSheetState extends State<_LogWeightSheet> {
             WeightEntry(
               id: const Uuid().v4(),
               userId: supabase.auth.currentUser!.id,
-              valueKg: parsed,
+              // The field is in the user's display unit; persist in kg.
+              valueKg: _units.weightToKg(parsed),
               timestamp: DateTime.now(),
             ),
           );
@@ -106,7 +111,7 @@ class _LogWeightSheetState extends State<_LogWeightSheet> {
               ],
               style: AppTypography.body,
               decoration: InputDecoration(
-                labelText: 'Weight (kg)',
+                labelText: 'Weight (${_units.weightLabel})',
                 labelStyle: AppTypography.label,
                 errorText: _error,
                 filled: true,

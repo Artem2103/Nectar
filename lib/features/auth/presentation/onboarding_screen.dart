@@ -70,7 +70,8 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent,
+      // Opaque scaffold (not transparent) so the strip the keyboard vacates
+      // doesn't flash the black OS window during the close animation.
       body: AppBackground(
         child: SafeArea(
           child: Center(

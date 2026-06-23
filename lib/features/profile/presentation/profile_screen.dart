@@ -2,13 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:supabase_flutter/supabase_flutter.dart';
+
 import '../../../app/router/app_routes.dart';
+import '../../../core/constants/app_info.dart';
 import '../../../core/supabase/supabase_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/app_typography.dart';
 import '../../../core/widgets/app_card.dart';
 import '../../../core/widgets/screen_title.dart';
+import '../../auth/application/auth_provider.dart';
 import '../application/goals_provider.dart';
 import '../application/settings_provider.dart';
 import '../application/theme_controller.dart';
@@ -22,7 +26,12 @@ class ProfileScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final email = supabase.auth.currentUser?.email ?? '';
+    // Rebuild when the session changes (e.g. after editing the display name) so
+    // the header and Account row reflect the latest user metadata.
+    ref.watch(authStateProvider);
+    final user = supabase.auth.currentUser;
+    final email = user?.email ?? '';
+    final name = (user?.userMetadata?['name'] as String?)?.trim();
     final settings = ref.watch(settingsProvider).value ?? AppSettings.defaults();
     final themeMode = ref.watch(themeControllerProvider);
     final dailyKcal = ref.watch(goalsProvider).value?.dailyKcal;
@@ -43,6 +52,23 @@ class ProfileScreen extends ConsumerWidget {
             const SizedBox(height: AppSpacing.xl),
             _Header(email: email),
             const SizedBox(height: AppSpacing.xl),
+            SettingsSection(
+              title: 'Account',
+              children: [
+                SettingsNavRow(
+                  icon: Icons.person_rounded,
+                  title: 'Name',
+                  trailingValue: (name == null || name.isEmpty) ? 'Add' : name,
+                  onTap: () => _editName(context, ref, name ?? ''),
+                ),
+                SettingsValueRow(
+                  icon: Icons.alternate_email_rounded,
+                  title: 'Email',
+                  value: email.isEmpty ? '—' : email,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
             SettingsSection(
               title: 'Goals & nutrition',
               children: [
@@ -101,6 +127,17 @@ class ProfileScreen extends ConsumerWidget {
                   onChanged: (v) => ref
                       .read(settingsProvider.notifier)
                       .updateSettings(settings.copyWith(streakNudges: v)),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            SettingsSection(
+              title: 'About',
+              children: [
+                SettingsValueRow(
+                  icon: Icons.info_outline_rounded,
+                  title: 'Version',
+                  value: AppInfo.version,
                 ),
               ],
             ),
@@ -174,6 +211,76 @@ class ProfileScreen extends ConsumerWidget {
           .read(settingsProvider.notifier)
           .updateSettings(settings.copyWith(units: choice));
     }
+  }
+
+  /// Prompts for a new display name and persists it to the Supabase user
+  /// metadata. The resulting `userUpdated` auth event rebuilds this screen.
+  Future<void> _editName(
+    BuildContext context,
+    WidgetRef ref,
+    String current,
+  ) async {
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (_) => _EditNameDialog(initial: current),
+    );
+    if (newName == null || newName == current) return;
+    try {
+      await supabase.auth.updateUser(UserAttributes(data: {'name': newName}));
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("Couldn't update name: $e")));
+      }
+    }
+  }
+}
+
+/// Name editor shown by [ProfileScreen._editName]. A [StatefulWidget] so it owns
+/// its [TextEditingController] and disposes it in [dispose] — popping the dialog
+/// returns the trimmed name (or `null` on cancel). (Disposing the controller
+/// from the caller raced the dialog's exit animation and crashed.)
+class _EditNameDialog extends StatefulWidget {
+  const _EditNameDialog({required this.initial});
+
+  final String initial;
+
+  @override
+  State<_EditNameDialog> createState() => _EditNameDialogState();
+}
+
+class _EditNameDialogState extends State<_EditNameDialog> {
+  late final _controller = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _submit() => Navigator.pop(context, _controller.text.trim());
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text('Your name', style: AppTypography.titleMedium),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        textCapitalization: TextCapitalization.words,
+        style: AppTypography.body,
+        decoration: const InputDecoration(hintText: 'Name'),
+        onSubmitted: (_) => _submit(),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        TextButton(onPressed: _submit, child: const Text('Save')),
+      ],
+    );
   }
 }
 

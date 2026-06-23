@@ -194,15 +194,16 @@ class _Segment extends StatelessWidget {
   }
 }
 
-/// Paints the weight trend as a dark polyline over a horizontal grid, with the
-/// 100 / 75 / 50 / 0 scale labelled down the right-hand gutter.
+/// Paints the weight trend as a dark polyline over a horizontal grid. The scale
+/// auto-fits the plotted values (with a little headroom) and labels four evenly
+/// spaced rows down the right-hand gutter, so it reads correctly whatever the
+/// weights or unit happen to be.
 class _WeightChartPainter extends CustomPainter {
   const _WeightChartPainter({required this.values});
 
   final List<double> values;
 
-  static const List<int> _gridValues = [100, 75, 50, 0];
-  static const double _maxValue = 100;
+  static const int _gridRows = 4; // labelled horizontal lines.
   static const double _gutter = 40; // right-hand space for the scale labels.
   static const double _vInset = 8; // keeps top/bottom labels off the edges.
 
@@ -211,19 +212,33 @@ class _WeightChartPainter extends CustomPainter {
     final chartWidth = size.width - _gutter;
     final usableHeight = size.height - _vInset * 2;
 
+    // Fit the vertical scale to the data with ~15% headroom so the trace never
+    // hugs the top or bottom edge. A flat series gets a small symmetric band.
+    var lo = values.isEmpty ? 0.0 : values.reduce((a, b) => a < b ? a : b);
+    var hi = values.isEmpty ? 1.0 : values.reduce((a, b) => a > b ? a : b);
+    if (hi == lo) {
+      lo -= 1;
+      hi += 1;
+    } else {
+      final pad = (hi - lo) * 0.15;
+      lo -= pad;
+      hi += pad;
+    }
+
     double yFor(double value) =>
-        _vInset + usableHeight * (1 - value.clamp(0, _maxValue) / _maxValue);
+        _vInset + usableHeight * (1 - (value - lo) / (hi - lo));
 
     final gridPaint = Paint()
       ..color = AppColors.border
       ..strokeWidth = 1;
 
-    for (final value in _gridValues) {
-      final y = yFor(value.toDouble());
+    for (var row = 0; row < _gridRows; row++) {
+      final value = hi - (hi - lo) * row / (_gridRows - 1);
+      final y = yFor(value);
       canvas.drawLine(Offset(0, y), Offset(chartWidth, y), gridPaint);
 
       final label = TextPainter(
-        text: TextSpan(text: '$value', style: AppTypography.caption),
+        text: TextSpan(text: value.round().toString(), style: AppTypography.caption),
         textDirection: TextDirection.ltr,
       )..layout();
       label.paint(
