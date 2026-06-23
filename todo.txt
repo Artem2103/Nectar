@@ -77,7 +77,7 @@
 ## AI
 
 - [x] image_picker + Claude API vision call in Add Meal flow (Phase 2)
-- [ ] Camera capture (alternative to gallery pick — currently gallery only)
+- [x] Camera capture (alternative to gallery pick — bottom sheet: camera or gallery)
 - [x] Result / confirmation with editable fields (in AddMealScreen)
 
 ## Backend
@@ -85,7 +85,7 @@
 - [x] Authentication (Supabase email/password: login, register, sign-out)
 - [x] Email-confirmation handling (verify-email screen + resend; onboarding waits for a session)
 - [x] Cloud database (Supabase Postgres + RLS — replaces SharedPreferences repositories)
-- [ ] Image storage (meal photos: upload to Supabase Storage; image_path is stored but not yet uploaded)
+- [x] Image storage (meal photos: upload to Supabase Storage `meal_images` bucket; public URL stored in image_path)
 
 ## Polish
 
@@ -93,3 +93,51 @@
 - [ ] Dark mode
 - [ ] Different Languages
 - [ ] Accessibility
+
+---
+
+## Bugs / Known issues (reported 2026-06-23)
+
+- [ ] Home: second carousel (NutritionCarousel) has a RenderFlex "overflow by 15 pixels" yellow/black stripe — fix the card/row height or content sizing
+- [ ] Home: carousel cards on adjacent pages touch when scrolling — need symmetric horizontal spacing/gutter between pages (viewportFraction + padding/peek)
+- [ ] AI: Claude vision API not actually connected for "Analyse photo" — wire up the real API key/request (deferred)
+
+---
+
+## Phase 5 — Profile expansion (currently just goals form + sign out)
+
+Restructure Profile into a hub: header → grouped settings list (tap row → detail screen / sheet).
+
+### Account & profile
+- [ ] Editable profile: display name, avatar photo (upload to Supabase Storage), email
+- [ ] Personal details: age, sex, height, activity level (feeds smarter goal suggestions)
+- [ ] Change password / change email
+- [ ] Delete account (with confirmation)
+
+### Goals & nutrition
+- [ ] Move goals form into a "Goals & targets" detail screen
+- [ ] Capture macro targets here (closes onboarding gap — protein/carbs/fat)
+- [ ] Units preference (metric / imperial — kg/lb, ml/oz)
+- [ ] Goal type (lose / maintain / gain) + weekly rate
+
+### Preferences
+- [ ] Theme: light / dark / system (ties into Dark mode polish item)
+- [ ] Language picker (ties into i18n polish item)
+- [ ] Notifications: meal reminders, weigh-in reminders, streak nudges (toggles)
+- [ ] Start-of-week, date/time format
+
+### Subscription & billing
+- [ ] Subscription tier (free / premium) — paywall + manage subscription screen
+- [ ] Restore purchases / billing portal link
+- [ ] Premium gating for AI photo analysis (usage limits on free tier)
+
+### About & support
+- [ ] Help / FAQ, contact support
+- [ ] Privacy policy + terms links
+- [ ] App version / build info
+- [ ] Rate the app / share
+
+### Foundation needed
+- [ ] Settings model + repository (persist preferences to Supabase + local cache)
+- [ ] Reusable settings-list widgets (section header, nav row, toggle row, value row)
+- [ ] Theme controller (Riverpod) wired to MaterialApp themeMode

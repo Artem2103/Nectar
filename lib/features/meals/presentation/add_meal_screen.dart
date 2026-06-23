@@ -38,6 +38,7 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
 
   File? _image;
   bool _analysing = false;
+  bool _saving = false;
 
   @override
   void dispose() {
@@ -48,7 +49,28 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
   }
 
   Future<void> _pickImage() async {
-    final picked = await ImagePicker().pickImage(source: ImageSource.gallery);
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      builder: (context) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_rounded),
+              title: Text('Take photo', style: AppTypography.body),
+              onTap: () => Navigator.pop(context, ImageSource.camera),
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_rounded),
+              title: Text('Choose from gallery', style: AppTypography.body),
+              onTap: () => Navigator.pop(context, ImageSource.gallery),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (source == null) return;
+    final picked = await ImagePicker().pickImage(source: source);
     if (picked == null) return;
     setState(() => _image = File(picked.path));
   }
@@ -75,20 +97,37 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
     }
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final entry = MealEntry(
-      id: const Uuid().v4(),
-      timestamp: DateTime.now(),
-      name: _name.text.trim(),
-      imagePath: _image?.path,
-      kcal: int.parse(_kcal.text),
-      proteinG: double.parse(_protein.text),
-      carbsG: double.parse(_carbs.text),
-      fatG: double.parse(_fat.text),
-    );
-    ref.read(mealRepositoryProvider.notifier).addMeal(entry);
-    context.pop();
+    setState(() => _saving = true);
+    final repo = ref.read(mealRepositoryProvider.notifier);
+    final id = const Uuid().v4();
+    try {
+      String? imageUrl;
+      final image = _image;
+      if (image != null) {
+        imageUrl = await repo.uploadImage(image, id);
+      }
+      final entry = MealEntry(
+        id: id,
+        timestamp: DateTime.now(),
+        name: _name.text.trim(),
+        imagePath: imageUrl,
+        kcal: int.parse(_kcal.text),
+        proteinG: double.parse(_protein.text),
+        carbsG: double.parse(_carbs.text),
+        fatG: double.parse(_fat.text),
+      );
+      await repo.addMeal(entry);
+      if (mounted) context.pop();
+    } catch (e) {
+      if (mounted) {
+        setState(() => _saving = false);
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(SnackBar(content: Text("Couldn't save meal: $e")));
+      }
+    }
   }
 
   @override
@@ -174,14 +213,15 @@ class _AddMealScreenState extends ConsumerState<AddMealScreen> {
                       PillButton(
                         label: _analysing ? 'Analysing…' : 'Analyse photo',
                         icon: Icons.auto_awesome_rounded,
-                        onPressed:
-                            (_image == null || _analysing) ? null : _analyse,
+                        onPressed: (_image == null || _analysing || _saving)
+                            ? null
+                            : _analyse,
                       ),
                       const Spacer(),
                       PillButton(
-                        label: 'Save meal',
+                        label: _saving ? 'Saving…' : 'Save meal',
                         icon: Icons.check_rounded,
-                        onPressed: _analysing ? null : _save,
+                        onPressed: (_analysing || _saving) ? null : _save,
                       ),
                     ],
                   ),

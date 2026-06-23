@@ -85,19 +85,41 @@ class _Thumbnail extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final image = _image();
+    if (image != null) {
+      return ClipRRect(borderRadius: AppRadii.mdAll, child: image);
+    }
+    return _placeholder();
+  }
+
+  /// Resolves [imagePath] to a sized image widget: a network image for uploaded
+  /// photos, a local file for not-yet-synced ones, or `null` when there's none.
+  Widget? _image() {
     final path = imagePath;
-    if (path != null && File(path).existsSync()) {
-      return ClipRRect(
-        borderRadius: AppRadii.mdAll,
-        child: Image.file(
-          File(path),
-          width: _size,
-          height: _size,
-          fit: BoxFit.cover,
-          excludeFromSemantics: true,
-        ),
+    if (path == null || path.isEmpty) return null;
+    if (path.startsWith('http')) {
+      return Image.network(
+        path,
+        width: _size,
+        height: _size,
+        fit: BoxFit.cover,
+        excludeFromSemantics: true,
+        errorBuilder: (context, error, stack) => _placeholder(),
       );
     }
+    if (File(path).existsSync()) {
+      return Image.file(
+        File(path),
+        width: _size,
+        height: _size,
+        fit: BoxFit.cover,
+        excludeFromSemantics: true,
+      );
+    }
+    return null;
+  }
+
+  Widget _placeholder() {
     return Container(
       width: _size,
       height: _size,

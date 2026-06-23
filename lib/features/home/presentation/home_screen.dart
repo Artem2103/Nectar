@@ -119,19 +119,39 @@ class _RecentlyUploaded extends ConsumerWidget {
   }
 }
 
-/// A vertical list of [MealCard]s with consistent spacing between them.
-class _MealList extends StatelessWidget {
+/// A vertical list of [MealCard]s with consistent spacing between them, each
+/// swipeable right-to-left to delete the meal.
+class _MealList extends ConsumerWidget {
   const _MealList({required this.meals});
 
   final List<MealEntry> meals;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Column(
       children: [
         for (var i = 0; i < meals.length; i++) ...[
           if (i > 0) const SizedBox(height: AppSpacing.md),
-          MealCard(meal: meals[i]),
+          Dismissible(
+            key: ValueKey(meals[i].id),
+            direction: DismissDirection.endToStart,
+            onDismissed: (_) => ref
+                .read(mealRepositoryProvider.notifier)
+                .deleteMeal(meals[i].id),
+            background: Container(
+              alignment: Alignment.centerRight,
+              padding: const EdgeInsets.only(right: AppSpacing.lg),
+              decoration: const BoxDecoration(
+                color: AppColors.streak,
+                borderRadius: AppRadii.lgAll,
+              ),
+              child: const Icon(
+                Icons.delete_rounded,
+                color: AppColors.onInverse,
+              ),
+            ),
+            child: MealCard(meal: meals[i]),
+          ),
         ],
       ],
     );

@@ -76,7 +76,14 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final initial = email.isNotEmpty ? email[0].toUpperCase() : '?';
+    final name =
+        (supabase.auth.currentUser?.userMetadata?['name'] as String?)?.trim();
+    final hasName = name != null && name.isNotEmpty;
+
+    final initialSource = hasName ? name : email;
+    final initial =
+        initialSource.isNotEmpty ? initialSource[0].toUpperCase() : '?';
+
     return AppCard(
       child: Row(
         children: [
@@ -91,11 +98,28 @@ class _Header extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.lg),
           Expanded(
-            child: Text(
-              email.isEmpty ? 'Signed in' : email,
-              style: AppTypography.titleMedium,
-              overflow: TextOverflow.ellipsis,
-            ),
+            child: hasName
+                ? Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: AppTypography.titleMedium,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: AppSpacing.xxs),
+                      Text(
+                        email,
+                        style: AppTypography.label,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  )
+                : Text(
+                    email.isEmpty ? 'Signed in' : email,
+                    style: AppTypography.titleMedium,
+                    overflow: TextOverflow.ellipsis,
+                  ),
           ),
         ],
       ),

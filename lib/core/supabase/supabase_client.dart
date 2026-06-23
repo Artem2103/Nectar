@@ -1,6 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-export 'package:supabase_flutter/supabase_flutter.dart' show SupabaseClient;
+export 'package:supabase_flutter/supabase_flutter.dart'
+    show SupabaseClient, FileOptions;
 
 /// Shorthand for the singleton Supabase client.
 ///
